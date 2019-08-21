@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wzkj.hzyp.dao.mybatis.JpCityInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.wzkj.hzyp.entity.JpCityInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="full_name" property="fullName" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="parent_code" property="parentCode" jdbcType="VARCHAR" />
+    <result column="sort_num" property="sortNum" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="create_user_code" property="createUserCode" jdbcType="INTEGER" />
+    <result column="update_user_code" property="updateUserCode" jdbcType="INTEGER" />
+    <result column="del_flag" property="delFlag" jdbcType="BIT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, full_name, code, parent_code, sort_num, create_time, update_time, create_user_code, 
+    update_user_code, del_flag
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from jp_city_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="getAreaByParentCode" resultMap="BaseResultMap">
+    SELECT
+	*
+    FROM
+	jp_city_info a
+    WHERE a.del_flag = 0
+    <if test="parentCode != null and parentCode != ''">
+     AND a.parent_code = #{parentCode}
+    </if>
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from jp_city_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wzkj.hzyp.entity.JpCityInfo" >
+    insert into jp_city_info (id, name, full_name, 
+      code, parent_code, sort_num, 
+      create_time, update_time, create_user_code, 
+      update_user_code, del_flag)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{fullName,jdbcType=VARCHAR}, 
+      #{code,jdbcType=VARCHAR}, #{parentCode,jdbcType=VARCHAR}, #{sortNum,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{createUserCode,jdbcType=INTEGER}, 
+      #{updateUserCode,jdbcType=INTEGER}, #{delFlag,jdbcType=BIT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wzkj.hzyp.entity.JpCityInfo" >
+    insert into jp_city_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="fullName != null" >
+        full_name,
+      </if>
+      <if test="code != null" >
+        code,
+      </if>
+      <if test="parentCode != null" >
+        parent_code,
+      </if>
+      <if test="sortNum != null" >
+        sort_num,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="createUserCode != null" >
+        create_user_code,
+      </if>
+      <if test="updateUserCode != null" >
+        update_user_code,
+      </if>
+      <if test="delFlag != null" >
+        del_flag,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="fullName != null" >
+        #{fullName,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="parentCode != null" >
+        #{parentCode,jdbcType=VARCHAR},
+      </if>
+      <if test="sortNum != null" >
+        #{sortNum,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUserCode != null" >
+        #{createUserCode,jdbcType=INTEGER},
+      </if>
+      <if test="updateUserCode != null" >
+        #{updateUserCode,jdbcType=INTEGER},
+      </if>
+      <if test="delFlag != null" >
+        #{delFlag,jdbcType=BIT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wzkj.hzyp.entity.JpCityInfo" >
+    update jp_city_info
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="fullName != null" >
+        full_name = #{fullName,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="parentCode != null" >
+        parent_code = #{parentCode,jdbcType=VARCHAR},
+      </if>
+      <if test="sortNum != null" >
+        sort_num = #{sortNum,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUserCode != null" >
+        create_user_code = #{createUserCode,jdbcType=INTEGER},
+      </if>
+      <if test="updateUserCode != null" >
+        update_user_code = #{updateUserCode,jdbcType=INTEGER},
+      </if>
+      <if test="delFlag != null" >
+        del_flag = #{delFlag,jdbcType=BIT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wzkj.hzyp.entity.JpCityInfo" >
+    update jp_city_info
+    set name = #{name,jdbcType=VARCHAR},
+      full_name = #{fullName,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      parent_code = #{parentCode,jdbcType=VARCHAR},
+      sort_num = #{sortNum,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      create_user_code = #{createUserCode,jdbcType=INTEGER},
+      update_user_code = #{updateUserCode,jdbcType=INTEGER},
+      del_flag = #{delFlag,jdbcType=BIT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

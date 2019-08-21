@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wzkj.hzyp.dao.mybatis.ReceviedInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.wzkj.hzyp.entity.ReceviedInfo" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="resume_id" property="resumeId" jdbcType="VARCHAR" />
+    <result column="job_id" property="jobId" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="del_flag" property="delFlag" jdbcType="INTEGER" />
+    <result column="a_user_id" property="aUserId" jdbcType="VARCHAR" />
+    <result column="b_user_id" property="bUserId" jdbcType="VARCHAR" />
+    <result column="latest_feedback" property="latestFeedback" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, resume_id, job_id, create_time, del_flag, a_user_id, b_user_id,latest_feedback,status
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from b_recevied_info
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from b_recevied_info
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.wzkj.hzyp.entity.ReceviedInfo" >
+    insert into b_recevied_info (id, resume_id, job_id, 
+      create_time, del_flag, a_user_id, 
+      b_user_id,latest_feedback,status)
+    values (#{id,jdbcType=VARCHAR}, #{resumeId,jdbcType=VARCHAR}, #{jobId,jdbcType=VARCHAR},
+      #{createTime,jdbcType=TIMESTAMP}, #{delFlag,jdbcType=INTEGER}, #{aUserId,jdbcType=VARCHAR}, 
+      #{bUserId,jdbcType=VARCHAR},#{latestFeedback,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wzkj.hzyp.entity.ReceviedInfo" >
+    insert into b_recevied_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="resumeId != null" >
+        resume_id,
+      </if>
+      <if test="jobId != null" >
+        job_id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="delFlag != null" >
+        del_flag,
+      </if>
+      <if test="aUserId != null" >
+        a_user_id,
+      </if>
+      <if test="bUserId != null" >
+        b_user_id,
+      </if>
+      <if test="latestFeedback != null" >
+      latest_feedback,
+    </if>
+      <if test="status != null" >
+        status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="resumeId != null" >
+        #{resumeId,jdbcType=VARCHAR},
+      </if>
+      <if test="jobId != null" >
+        #{jobId,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlag != null" >
+        #{delFlag,jdbcType=INTEGER},
+      </if>
+      <if test="aUserId != null" >
+        #{aUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="bUserId != null" >
+        #{bUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="latestFeedback != null" >
+        #{latestFeedback,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wzkj.hzyp.entity.ReceviedInfo" >
+    update b_recevied_info
+    <set >
+      <if test="resumeId != null" >
+        resume_id = #{resumeId,jdbcType=VARCHAR},
+      </if>
+      <if test="jobId != null" >
+        job_id = #{jobId,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlag != null" >
+        del_flag = #{delFlag,jdbcType=INTEGER},
+      </if>
+      <if test="aUserId != null" >
+        a_user_id = #{aUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="bUserId != null" >
+        b_user_id = #{bUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="latestFeedback != null" >
+        latest_feedback = #{latestFeedback,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wzkj.hzyp.entity.ReceviedInfo" >
+    update b_recevied_info
+    set resume_id = #{resumeId,jdbcType=VARCHAR},
+      job_id = #{jobId,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      del_flag = #{delFlag,jdbcType=INTEGER},
+      a_user_id = #{aUserId,jdbcType=VARCHAR},
+      b_user_id = #{bUserId,jdbcType=VARCHAR},
+      latest_feedback = #{latestFeedback,jdbcType=VARCHAR,},
+      status = #{status,jdbcType=INTEGER},
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

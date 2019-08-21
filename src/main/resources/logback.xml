@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="PROJECT_NAME" value="HZYP"/>
+    <property name="LOG_HOME" value="/var/log/java/web/hzyp" />
+    <property name="ERROR_LOG_HOME" value="${LOG_HOME}/error" />
+    <property name="CHARSET" value="UTF-8"/>
+    <property name="MAX_HISTORY" value="30"/>
+    
+    <!-- additivity设为false,则logger内容不附加至root -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <Encoder>
+            <pattern>|%p|%d{yyyy-MM-dd HH:mm:ss.SSS}|%t|%logger{10}|%M|%m%n</pattern>
+            <charset>${CHARSET}</charset>
+        </Encoder>
+    </appender>
+
+	<appender name="ERROR_FILE_STDOUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${ERROR_LOG_HOME}/out_error.log</file>
+         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter> 
+        <Encoder>
+            <pattern>|%p|%d{yyyy-MM-dd HH:mm:ss.SSS}|%t|%-40logger{10}|%M|%m%n</pattern>
+            <charset>${CHARSET}</charset>
+        </Encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${ERROR_LOG_HOME}/out_error_%d{yyyy-MM-dd}.log</FileNamePattern>
+            <!-- 日志最大的历史 30天 -->
+            <MaxHistory>${MAX_HISTORY}</MaxHistory>
+            <!-- <MaxFileSize>10MB</MaxFileSize> -->
+        </rollingPolicy>
+    </appender>
+
+    <appender name="FILE_STDOUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/out.log</file>
+        <Encoder>
+            <pattern>|%p|%d{yyyy-MM-dd HH:mm:ss.SSS}|%t|%-40logger{10}|%M|%m%n</pattern>
+            <charset>${CHARSET}</charset>
+        </Encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_HOME}/out_%d{yyyy-MM-dd}.log</FileNamePattern>
+            <!-- 日志最大的历史 30天 -->
+            <MaxHistory>${MAX_HISTORY}</MaxHistory>
+            <!-- <MaxFileSize>10MB</MaxFileSize> -->
+        </rollingPolicy>
+    </appender>
+
+	<logger name="com.dapp" level="DEBUG" />
+    <root level="INFO">
+    	<appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE_STDOUT" />
+    	<appender-ref ref="ERROR_FILE_STDOUT" />
+  	</root>
+</configuration>

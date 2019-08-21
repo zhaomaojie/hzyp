@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wzkj.hzyp.dao.mybatis.StoreInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.wzkj.hzyp.entity.StoreInfo" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="city_code" property="cityCode" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="industry_code" property="industryCode" jdbcType="VARCHAR" />
+    <result column="contact_name" property="contactName" jdbcType="VARCHAR" />
+    <result column="business_img" property="businessImg" jdbcType="VARCHAR" />
+    <result column="logo" property="logo" jdbcType="VARCHAR" />
+    <result column="company_img" property="companyImg" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="del_flag" property="delFlag" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="b_user_id" property="bUserId" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, city_code, address, industry_code, contact_name, business_img, logo, company_img, 
+    phone, del_flag, create_time, update_time, b_user_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from b_store_info
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from b_store_info
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.wzkj.hzyp.entity.StoreInfo" >
+    insert into b_store_info (id, name, city_code, 
+      address, industry_code, contact_name, 
+      business_img, logo, company_img, 
+      phone, del_flag, create_time, 
+      update_time, b_user_id)
+    values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{cityCode,jdbcType=VARCHAR}, 
+      #{address,jdbcType=VARCHAR}, #{industryCode,jdbcType=VARCHAR}, #{contactName,jdbcType=VARCHAR}, 
+      #{businessImg,jdbcType=VARCHAR}, #{logo,jdbcType=VARCHAR}, #{companyImg,jdbcType=VARCHAR}, 
+      #{phone,jdbcType=VARCHAR}, #{delFlag,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{bUserId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wzkj.hzyp.entity.StoreInfo" >
+    insert into b_store_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="cityCode != null" >
+        city_code,
+      </if>
+      <if test="address != null" >
+        address,
+      </if>
+      <if test="industryCode != null" >
+        industry_code,
+      </if>
+      <if test="contactName != null" >
+        contact_name,
+      </if>
+      <if test="businessImg != null" >
+        business_img,
+      </if>
+      <if test="logo != null" >
+        logo,
+      </if>
+      <if test="companyImg != null" >
+        company_img,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="delFlag != null" >
+        del_flag,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="bUserId != null" >
+        b_user_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="cityCode != null" >
+        #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="industryCode != null" >
+        #{industryCode,jdbcType=VARCHAR},
+      </if>
+      <if test="contactName != null" >
+        #{contactName,jdbcType=VARCHAR},
+      </if>
+      <if test="businessImg != null" >
+        #{businessImg,jdbcType=VARCHAR},
+      </if>
+      <if test="logo != null" >
+        #{logo,jdbcType=VARCHAR},
+      </if>
+      <if test="companyImg != null" >
+        #{companyImg,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="delFlag != null" >
+        #{delFlag,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="bUserId != null" >
+        #{bUserId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wzkj.hzyp.entity.StoreInfo" >
+    update b_store_info
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="cityCode != null" >
+        city_code = #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="industryCode != null" >
+        industry_code = #{industryCode,jdbcType=VARCHAR},
+      </if>
+      <if test="contactName != null" >
+        contact_name = #{contactName,jdbcType=VARCHAR},
+      </if>
+      <if test="businessImg != null" >
+        business_img = #{businessImg,jdbcType=VARCHAR},
+      </if>
+      <if test="logo != null" >
+        logo = #{logo,jdbcType=VARCHAR},
+      </if>
+      <if test="companyImg != null" >
+        company_img = #{companyImg,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="delFlag != null" >
+        del_flag = #{delFlag,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="bUserId != null" >
+        b_user_id = #{bUserId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wzkj.hzyp.entity.StoreInfo" >
+    update b_store_info
+    set name = #{name,jdbcType=VARCHAR},
+      city_code = #{cityCode,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      industry_code = #{industryCode,jdbcType=VARCHAR},
+      contact_name = #{contactName,jdbcType=VARCHAR},
+      business_img = #{businessImg,jdbcType=VARCHAR},
+      logo = #{logo,jdbcType=VARCHAR},
+      company_img = #{companyImg,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      del_flag = #{delFlag,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      b_user_id = #{bUserId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

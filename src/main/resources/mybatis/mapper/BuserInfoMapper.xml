@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wzkj.hzyp.dao.mybatis.BuserInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.wzkj.hzyp.entity.BuserInfo" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="age" property="age" jdbcType="INTEGER" />
+    <result column="empower_phone" property="empowerPhone" jdbcType="VARCHAR" />
+    <result column="verify_code" property="verifyCode" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="last_login_time" property="lastLoginTime" jdbcType="TIMESTAMP" />
+    <result column="del_flag" property="delFlag" jdbcType="INTEGER" />
+    <result column="verdify_code_time" property="verdifyCodeTime" jdbcType="TIMESTAMP" />
+    <result column="open_id" property="openId" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, age, empower_phone, verify_code, create_time, update_time, last_login_time, 
+    del_flag, verdify_code_time,open_id
+  </sql>
+
+  <select id="getAmountBalance" resultType="java.lang.Integer">
+    SELECT
+	sum(a.reward) totalMoney
+    FROM
+	b_job_info a
+    WHERE
+	1 = 1
+	<if test="bUserId != null and bUserId != ''">
+      AND a.b_user_id = #{aUserId}
+    </if>
+    AND a.del_flag = 0
+  </select>
+
+  <select id="getJobNum" resultType="java.lang.Integer">
+    SELECT
+	COUNT(*) jobNum
+	FROM
+	b_job_info a
+	WHERE
+     a.del_flag = 0
+    <if test="bUserId != null and bUserId != ''">
+      AND a.b_user_id = #{aUserId}
+    </if>
+  </select>
+
+  <select id="getResumeNum" resultType="java.lang.Integer">
+    SELECT
+	count(*)
+    FROM
+	b_recevied_info a
+    WHERE
+	a.del_flag = 0
+    <if test="bUserId != null and bUserId != ''">
+      AND a.b_user_id = #{aUserId}
+    </if>
+  </select>
+
+  <select id="getSumMoney" resultType="java.lang.Integer">
+    SELECT
+	sum(a.money) sumMoney
+    FROM
+	a_cashout_detail a
+    <if test="bUserId != null and bUserId != ''">
+      AND a.b_user_id = #{aUserId}</if>
+    </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from b_user_info
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from b_user_info
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.wzkj.hzyp.entity.BuserInfo" >
+    insert into b_user_info (id, name, age, 
+      empower_phone, verify_code, create_time, 
+      update_time, last_login_time, del_flag, 
+      verdify_code_time,open_id)
+    values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{age,jdbcType=INTEGER}, 
+      #{empowerPhone,jdbcType=VARCHAR}, #{verifyCode,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{lastLoginTime,jdbcType=TIMESTAMP}, #{delFlag,jdbcType=INTEGER}, 
+      #{verdifyCodeTime,jdbcType=TIMESTAMP},#{openId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wzkj.hzyp.entity.BuserInfo" >
+    insert into b_user_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="age != null" >
+        age,
+      </if>
+      <if test="empowerPhone != null" >
+        empower_phone,
+      </if>
+      <if test="verifyCode != null" >
+        verify_code,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="lastLoginTime != null" >
+        last_login_time,
+      </if>
+      <if test="delFlag != null" >
+        del_flag,
+      </if>
+      <if test="verdifyCodeTime != null" >
+        verdify_code_time,
+      </if>
+      <if test="openId != null" >
+        open_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="age != null" >
+        #{age,jdbcType=INTEGER},
+      </if>
+      <if test="empowerPhone != null" >
+        #{empowerPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="verifyCode != null" >
+        #{verifyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastLoginTime != null" >
+        #{lastLoginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlag != null" >
+        #{delFlag,jdbcType=INTEGER},
+      </if>
+      <if test="verdifyCodeTime != null" >
+        #{verdifyCodeTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wzkj.hzyp.entity.BuserInfo" >
+    update b_user_info
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="age != null" >
+        age = #{age,jdbcType=INTEGER},
+      </if>
+      <if test="empowerPhone != null" >
+        empower_phone = #{empowerPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="verifyCode != null" >
+        verify_code = #{verifyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastLoginTime != null" >
+        last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlag != null" >
+        del_flag = #{delFlag,jdbcType=INTEGER},
+      </if>
+      <if test="verdifyCodeTime != null" >
+        verdify_code_time = #{verdifyCodeTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="openId != null" >
+        open_id = #{openId,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wzkj.hzyp.entity.BuserInfo" >
+    update b_user_info
+    set name = #{name,jdbcType=VARCHAR},
+      age = #{age,jdbcType=INTEGER},
+      empower_phone = #{empowerPhone,jdbcType=VARCHAR},
+      verify_code = #{verifyCode,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
+      del_flag = #{delFlag,jdbcType=INTEGER},
+      verdify_code_time = #{verdifyCodeTime,jdbcType=TIMESTAMP},
+      open_id = #{openId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

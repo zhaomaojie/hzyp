@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wzkj.hzyp.dao.mybatis.JobInfoMapper">
+    <resultMap id="BaseResultMap" type="com.wzkj.hzyp.entity.JobInfo">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="b_store_id" property="bStoreId" jdbcType="VARCHAR"/>
+        <result column="b_user_id" property="bUserId" jdbcType="VARCHAR"/>
+        <result column="industry_code" property="industryCode" jdbcType="VARCHAR"/>
+        <result column="job_name" property="jobName" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="num" property="num" jdbcType="INTEGER"/>
+        <result column="education_degree" property="educationDegree" jdbcType="INTEGER"/>
+        <result column="work_experience" property="workExperience" jdbcType="INTEGER"/>
+        <result column="age_min" property="ageMin" jdbcType="INTEGER"/>
+        <result column="age_max" property="ageMax" jdbcType="INTEGER"/>
+        <result column="probation" property="probation" jdbcType="INTEGER"/>
+        <result column="trial_time" property="trialTime" jdbcType="VARCHAR"/>
+        <result column="trial_salary" property="trialSalary" jdbcType="VARCHAR"/>
+        <result column="official_salary" property="officialSalary" jdbcType="VARCHAR"/>
+        <result column="avg_salary" property="avgSalary" jdbcType="VARCHAR"/>
+        <result column="interview_time" property="interviewTime" jdbcType="VARCHAR"/>
+        <result column="reward" property="reward" jdbcType="INTEGER"/>
+        <result column="overtime" property="overtime" jdbcType="INTEGER"/>
+        <result column="total_amount" property="totalAmount" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="del_flag" property="delFlag" jdbcType="INTEGER"/>
+        <result column="recevied_resume_number" property="receviedResumeNumber" jdbcType="INTEGER"/>
+        <result column="total_resume_number" property="totalResumeNumber" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="label" property="label" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, b_store_id, b_user_id, industry_code, job_name, description, num, education_degree, 
+    work_experience, age_min,age_max, probation, trial_time, trial_salary, official_salary, avg_salary,
+    interview_time, reward, overtime, total_amount, status, del_flag, recevied_resume_number, 
+    total_resume_number, create_time, update_time, label
+  </sql>
+
+    <select id="getJobList" resultType="java.util.HashMap">
+        SELECT
+        a.id,
+        a.job_name jobName,
+        a.num,
+        a.description,
+        a.age_min ageMin,
+        a.age_max ageMax,
+        a.education_degree educationDegree,
+        a.work_experience workExpenience,
+        a.probation,
+        a.trial_time trialTime,
+        a.trial_salary trialSalary,
+        a.official_salary officialSalary,
+        a.avg_salary avgSalary,
+        a.reward,
+        a.interview_time interviewTime,
+        a.overtime,
+        a. status,
+        a.create_time createTime,
+        a.label,
+        b.address,
+        b.logo
+        FROM
+        B_JOB_INFO a
+        LEFT JOIN B_STORE_INFO b ON a.b_store_id = b.id
+        WHERE
+        a.del_flag = 0
+        AND a.`status` = 1
+        <if test="keyWord != null and keyWord !=''">
+            AND a.job_name LIKE "%"#{keyWord}"%" OR b.name LIKE "%"#{keyWord}"%"
+        </if>
+
+        <if test="label != null">
+            AND a.label = #{label}
+        </if>
+        ORDER BY a.create_time DESC
+    </select>
+
+    <select id="jobDetail" resultType="java.util.HashMap">
+        SELECT
+        a.id,
+        a.job_name jobName,
+        a.num,
+        a.description,
+        a.age_min ageMin,
+        a.age_max ageMax,
+        a.education_degree educationDegree,
+        a.work_experience workExpenience,
+        a.probation,
+        a.trial_time trialTime,
+        a.trial_salary trialSalary,
+        a.official_salary officialSalary,
+        a.avg_salary avgSalary,
+        a.reward,
+        a.interview_time interviewTime,
+        a.overtime,
+        a. status,
+        a.create_time createTime,
+        a.label,
+        b.address,
+        b.logo,
+        b.name storeName
+        FROM
+        B_JOB_INFO a
+        LEFT JOIN B_STORE_INFO b ON a.b_store_id = b.id
+        WHERE
+        a.del_flag = 0
+        AND a.`status` = 1
+        <if test="id != null and id != ''">
+            AND a.id = #{id}
+        </if>
+    </select>
+
+    <select id="collectionJobList" resultType="java.util.HashMap">
+        SELECT
+        a.id,
+        a.job_name jobName,
+        a.num,
+        a.description,
+        a.age_min ageMin,
+        a.age_max ageMax,
+        a.education_degree educationDegree,
+        a.work_experience workExpenience,
+        a.probation,
+        a.trial_time trialTime,
+        a.trial_salary trialSalary,
+        a.official_salary officialSalary,
+        a.avg_salary avgSalary,
+        a.reward,
+        a.interview_time interviewTime,
+        a.overtime,
+        a. status,
+        a.create_time createTime,
+        a.label,
+        b.create_time recriptTime,
+        b.status collectionJobStatus,c.address
+        FROM  b_job_info a
+        INNER JOIN a_collection_job_info b ON a.id = b.job_id
+        LEFT JOIN b_store_info c ON a.b_store_id = c.id
+        WHERE 1 = 1
+        <if test="aUserId != null and aUserId != ''">
+          AND b.a_user_id = #{aUserId}
+        </if>
+
+        <if test="status != null">
+            AND b.status = #{status}
+        </if>
+    </select>
+
+    <select id="publishJobList" resultType="java.util.HashMap">
+        SELECT
+        a.id,
+        a.job_name jobName,
+        a.num,
+        a.description,
+        a.age_min ageMin,
+        a.age_max ageMax,
+        a.education_degree educationDegree,
+        a.work_experience workExpenience,
+        a.probation,
+        a.trial_time trialTime,
+        a.trial_salary trialSalary,
+        a.official_salary officialSalary,
+        a.avg_salary avgSalary,
+        a.reward,
+        a.interview_time interviewTime,
+        a.overtime,
+        a. status,
+        a.create_time createTime,
+        a.label,
+        ,b.address
+        FROM
+	    b_job_info a
+        INNER JOIN b_store_info b ON a.b_store_id = b.id
+        WHERE 1 = 1
+        <if test="bUserId != null and bUserId != ''">
+            AND a.b_user_id = #{bUserId}
+        </if>
+        <if test="jobName != null and jobName != ''">
+            AND a.job_name = #{jobName}
+        </if>
+        <if test="status != null">
+            AND a.status = #{status}
+        </if>
+        ORDER BY a.create_time ASC
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from b_job_info
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from b_job_info
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+    <insert id="insert" parameterType="com.wzkj.hzyp.entity.JobInfo">
+    insert into b_job_info (id, b_store_id, b_user_id, 
+      industry_code, job_name, description, 
+      num, education_degree, work_experience, 
+      age_min.age_max, probation, trial_time,
+      trial_salary, official_salary, avg_salary, 
+      interview_time, reward, overtime, 
+      total_amount, status, del_flag, 
+      recevied_resume_number, total_resume_number, 
+      create_time, update_time, label
+      )
+    values (#{id,jdbcType=VARCHAR}, #{bStoreId,jdbcType=VARCHAR}, #{bUserId,jdbcType=VARCHAR}, 
+      #{industryCode,jdbcType=VARCHAR}, #{jobName,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 
+      #{num,jdbcType=INTEGER}, #{educationDegree,jdbcType=INTEGER}, #{workExperience,jdbcType=INTEGER},
+      #{ageMin,jdbcType=INTEGER},#{ageMax,jdbcType=INTEGER}, #{probation,jdbcType=INTEGER}, #{trialTime,jdbcType=VARCHAR},
+      #{trialSalary,jdbcType=VARCHAR}, #{officialSalary,jdbcType=VARCHAR}, #{avgSalary,jdbcType=VARCHAR}, 
+      #{interviewTime,jdbcType=VARCHAR}, #{reward,jdbcType=INTEGER}, #{overtime,jdbcType=INTEGER},
+      #{totalAmount,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{delFlag,jdbcType=INTEGER},
+      #{receviedResumeNumber,jdbcType=INTEGER}, #{totalResumeNumber,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{label,jdbcType=INTEGER}
+      )
+  </insert>
+    <insert id="insertSelective" parameterType="com.wzkj.hzyp.entity.JobInfo">
+        insert into b_job_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="bStoreId != null">
+                b_store_id,
+            </if>
+            <if test="bUserId != null">
+                b_user_id,
+            </if>
+            <if test="industryCode != null">
+                industry_code,
+            </if>
+            <if test="jobName != null">
+                job_name,
+            </if>
+            <if test="description != null">
+                description,
+            </if>
+            <if test="num != null">
+                num,
+            </if>
+            <if test="educationDegree != null">
+                education_degree,
+            </if>
+            <if test="workExperience != null">
+                work_experience,
+            </if>
+            <if test="age_min != null">
+                ageMin,
+            </if>
+            <if test="age_max != null">
+                ageMax,
+            </if>
+            <if test="probation != null">
+                probation,
+            </if>
+            <if test="trialTime != null">
+                trial_time,
+            </if>
+            <if test="trialSalary != null">
+                trial_salary,
+            </if>
+            <if test="officialSalary != null">
+                official_salary,
+            </if>
+            <if test="avgSalary != null">
+                avg_salary,
+            </if>
+            <if test="interviewTime != null">
+                interview_time,
+            </if>
+            <if test="reward != null">
+                reward,
+            </if>
+            <if test="overtime != null">
+                overtime,
+            </if>
+            <if test="totalAmount != null">
+                total_amount,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="delFlag != null">
+                del_flag,
+            </if>
+            <if test="receviedResumeNumber != null">
+                recevied_resume_number,
+            </if>
+            <if test="totalResumeNumber != null">
+                total_resume_number,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="label != null">
+                label,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="bStoreId != null">
+                #{bStoreId,jdbcType=VARCHAR},
+            </if>
+            <if test="bUserId != null">
+                #{bUserId,jdbcType=VARCHAR},
+            </if>
+            <if test="industryCode != null">
+                #{industryCode,jdbcType=VARCHAR},
+            </if>
+            <if test="jobName != null">
+                #{jobName,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="num != null">
+                #{num,jdbcType=INTEGER},
+            </if>
+            <if test="educationDegree != null">
+                #{educationDegree,jdbcType=INTEGER},
+            </if>
+            <if test="workExperience != null">
+                #{workExperience,jdbcType=INTEGER},
+            </if>
+            <if test="ageMin != null">
+                #{ageMin,jdbcType=VARCHAR},
+            </if>
+            <if test="ageMax != null">
+                #{ageMax,jdbcType=VARCHAR},
+            </if>
+            <if test="probation != null">
+                #{probation,jdbcType=INTEGER},
+            </if>
+            <if test="trialTime != null">
+                #{trialTime,jdbcType=VARCHAR},
+            </if>
+            <if test="trialSalary != null">
+                #{trialSalary,jdbcType=VARCHAR},
+            </if>
+            <if test="officialSalary != null">
+                #{officialSalary,jdbcType=VARCHAR},
+            </if>
+            <if test="avgSalary != null">
+                #{avgSalary,jdbcType=VARCHAR},
+            </if>
+            <if test="interviewTime != null">
+                #{interviewTime,jdbcType=VARCHAR},
+            </if>
+            <if test="reward != null">
+                #{reward,jdbcType=INTEGER},
+            </if>
+            <if test="overtime != null">
+                #{overtime,jdbcType=INTEGER},
+            </if>
+            <if test="totalAmount != null">
+                #{totalAmount,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="delFlag != null">
+                #{delFlag,jdbcType=INTEGER},
+            </if>
+            <if test="receviedResumeNumber != null">
+                #{receviedResumeNumber,jdbcType=INTEGER},
+            </if>
+            <if test="totalResumeNumber != null">
+                #{totalResumeNumber,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="label != null">
+                #{label,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.wzkj.hzyp.entity.JobInfo">
+        update b_job_info
+        <set>
+            <if test="bStoreId != null">
+                b_store_id = #{bStoreId,jdbcType=VARCHAR},
+            </if>
+            <if test="bUserId != null">
+                b_user_id = #{bUserId,jdbcType=VARCHAR},
+            </if>
+            <if test="industryCode != null">
+                industry_code = #{industryCode,jdbcType=VARCHAR},
+            </if>
+            <if test="jobName != null">
+                job_name = #{jobName,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                description = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="num != null">
+                num = #{num,jdbcType=INTEGER},
+            </if>
+            <if test="educationDegree != null">
+                education_degree = #{educationDegree,jdbcType=INTEGER},
+            </if>
+            <if test="workExperience != null">
+                work_experience = #{workExperience,jdbcType=INTEGER},
+            </if>
+            <if test="ageMin != null">
+                age_min = #{ageMin,jdbcType=VARCHAR},
+            </if>
+            <if test="ageMax != null">
+                age_max = #{ageMax,jdbcType=VARCHAR},
+            </if>
+            <if test="probation != null">
+                probation = #{probation,jdbcType=INTEGER},
+            </if>
+            <if test="trialTime != null">
+                trial_time = #{trialTime,jdbcType=VARCHAR},
+            </if>
+            <if test="trialSalary != null">
+                trial_salary = #{trialSalary,jdbcType=VARCHAR},
+            </if>
+            <if test="officialSalary != null">
+                official_salary = #{officialSalary,jdbcType=VARCHAR},
+            </if>
+            <if test="avgSalary != null">
+                avg_salary = #{avgSalary,jdbcType=VARCHAR},
+            </if>
+            <if test="interviewTime != null">
+                interview_time = #{interviewTime,jdbcType=VARCHAR},
+            </if>
+            <if test="reward != null">
+                reward = #{reward,jdbcType=INTEGER},
+            </if>
+            <if test="overtime != null">
+                overtime = #{overtime,jdbcType=INTEGER},
+            </if>
+            <if test="totalAmount != null">
+                total_amount = #{totalAmount,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="delFlag != null">
+                del_flag = #{delFlag,jdbcType=INTEGER},
+            </if>
+            <if test="receviedResumeNumber != null">
+                recevied_resume_number = #{receviedResumeNumber,jdbcType=INTEGER},
+            </if>
+            <if test="totalResumeNumber != null">
+                total_resume_number = #{totalResumeNumber,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="label != null">
+                label = #{label,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.wzkj.hzyp.entity.JobInfo">
+    update b_job_info
+    set b_store_id = #{bStoreId,jdbcType=VARCHAR},
+      b_user_id = #{bUserId,jdbcType=VARCHAR},
+      industry_code = #{industryCode,jdbcType=VARCHAR},
+      job_name = #{jobName,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR},
+      num = #{num,jdbcType=INTEGER},
+      education_degree = #{educationDegree,jdbcType=INTEGER},
+      work_experience = #{workExperience,jdbcType=INTEGER},
+      age_min = #{ageMin,jdbcType=INTEGER},
+      age_max = #{ageMax,jdbcType=INTEGER},
+      probation = #{probation,jdbcType=INTEGER},
+      trial_time = #{trialTime,jdbcType=VARCHAR},
+      trial_salary = #{trialSalary,jdbcType=VARCHAR},
+      official_salary = #{officialSalary,jdbcType=VARCHAR},
+      avg_salary = #{avgSalary,jdbcType=VARCHAR},
+      interview_time = #{interviewTime,jdbcType=VARCHAR},
+      reward = #{reward,jdbcType=INTEGER},
+      overtime = #{overtime,jdbcType=INTEGER},
+      total_amount = #{totalAmount,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      del_flag = #{delFlag,jdbcType=INTEGER},
+      recevied_resume_number = #{receviedResumeNumber,jdbcType=INTEGER},
+      total_resume_number = #{totalResumeNumber,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      label = #{label,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

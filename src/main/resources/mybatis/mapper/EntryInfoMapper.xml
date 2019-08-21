@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wzkj.hzyp.dao.mybatis.EntryInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.wzkj.hzyp.entity.EntryInfo" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="a_user_id" property="aUserId" jdbcType="VARCHAR" />
+    <result column="b_user_id" property="bUserId" jdbcType="VARCHAR" />
+    <result column="job_id" property="jobId" jdbcType="VARCHAR" />
+    <result column="resume_id" property="resumeId" jdbcType="VARCHAR" />
+    <result column="recevied_id" property="receviedId" jdbcType="VARCHAR" />
+    <result column="entry_time" property="entryTime" jdbcType="TIMESTAMP" />
+    <result column="overtime" property="overtime" jdbcType="INTEGER" />
+    <result column="over_datetime" property="overDatetime" jdbcType="TIMESTAMP" />
+    <result column="del_flag" property="delFlag" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="is_cash" property="isCash" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, a_user_id, b_user_id, job_id, resume_id, recevied_id, entry_time, overtime, over_datetime, 
+    del_flag, create_time, is_cash
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from c_entry_info
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from c_entry_info
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.wzkj.hzyp.entity.EntryInfo" >
+    insert into c_entry_info (id, a_user_id, b_user_id, 
+      job_id, resume_id, recevied_id, 
+      entry_time, overtime, over_datetime, 
+      del_flag, create_time, is_cash
+      )
+    values (#{id,jdbcType=VARCHAR}, #{aUserId,jdbcType=VARCHAR}, #{bUserId,jdbcType=VARCHAR}, 
+      #{jobId,jdbcType=VARCHAR}, #{resumeId,jdbcType=VARCHAR}, #{receviedId,jdbcType=VARCHAR}, 
+      #{entryTime,jdbcType=TIMESTAMP}, #{overtime,jdbcType=INTEGER}, #{overDatetime,jdbcType=TIMESTAMP}, 
+      #{delFlag,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{isCash,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.wzkj.hzyp.entity.EntryInfo" >
+    insert into c_entry_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="aUserId != null" >
+        a_user_id,
+      </if>
+      <if test="bUserId != null" >
+        b_user_id,
+      </if>
+      <if test="jobId != null" >
+        job_id,
+      </if>
+      <if test="resumeId != null" >
+        resume_id,
+      </if>
+      <if test="receviedId != null" >
+        recevied_id,
+      </if>
+      <if test="entryTime != null" >
+        entry_time,
+      </if>
+      <if test="overtime != null" >
+        overtime,
+      </if>
+      <if test="overDatetime != null" >
+        over_datetime,
+      </if>
+      <if test="delFlag != null" >
+        del_flag,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="isCash != null" >
+        is_cash,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="aUserId != null" >
+        #{aUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="bUserId != null" >
+        #{bUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="jobId != null" >
+        #{jobId,jdbcType=VARCHAR},
+      </if>
+      <if test="resumeId != null" >
+        #{resumeId,jdbcType=VARCHAR},
+      </if>
+      <if test="receviedId != null" >
+        #{receviedId,jdbcType=VARCHAR},
+      </if>
+      <if test="entryTime != null" >
+        #{entryTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="overtime != null" >
+        #{overtime,jdbcType=INTEGER},
+      </if>
+      <if test="overDatetime != null" >
+        #{overDatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlag != null" >
+        #{delFlag,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isCash != null" >
+        #{isCash,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wzkj.hzyp.entity.EntryInfo" >
+    update c_entry_info
+    <set >
+      <if test="aUserId != null" >
+        a_user_id = #{aUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="bUserId != null" >
+        b_user_id = #{bUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="jobId != null" >
+        job_id = #{jobId,jdbcType=VARCHAR},
+      </if>
+      <if test="resumeId != null" >
+        resume_id = #{resumeId,jdbcType=VARCHAR},
+      </if>
+      <if test="receviedId != null" >
+        recevied_id = #{receviedId,jdbcType=VARCHAR},
+      </if>
+      <if test="entryTime != null" >
+        entry_time = #{entryTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="overtime != null" >
+        overtime = #{overtime,jdbcType=INTEGER},
+      </if>
+      <if test="overDatetime != null" >
+        over_datetime = #{overDatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlag != null" >
+        del_flag = #{delFlag,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isCash != null" >
+        is_cash = #{isCash,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wzkj.hzyp.entity.EntryInfo" >
+    update c_entry_info
+    set a_user_id = #{aUserId,jdbcType=VARCHAR},
+      b_user_id = #{bUserId,jdbcType=VARCHAR},
+      job_id = #{jobId,jdbcType=VARCHAR},
+      resume_id = #{resumeId,jdbcType=VARCHAR},
+      recevied_id = #{receviedId,jdbcType=VARCHAR},
+      entry_time = #{entryTime,jdbcType=TIMESTAMP},
+      overtime = #{overtime,jdbcType=INTEGER},
+      over_datetime = #{overDatetime,jdbcType=TIMESTAMP},
+      del_flag = #{delFlag,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      is_cash = #{isCash,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

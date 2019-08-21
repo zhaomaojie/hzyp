@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wzkj.hzyp.dao.mybatis.CashoutDetailMapper" >
+  <resultMap id="BaseResultMap" type="com.wzkj.hzyp.entity.CashoutDetail" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="job_id" property="jobId" jdbcType="VARCHAR" />
+    <result column="job_name" property="jobName" jdbcType="VARCHAR" />
+    <result column="cashout_time" property="cashoutTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="money" property="money" jdbcType="INTEGER" />
+    <result column="a_user_id" property="aUserId" jdbcType="VARCHAR" />
+    <result column="b_user_id" property="bUserId" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, job_id, job_name, cashout_time, create_time, money, a_user_id, b_user_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from a_cashout_detail
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+
+  <select id="getCashoutDetail" resultMap="BaseResultMap">
+    SELECT *
+    FROM
+    a_cashout_detail a
+    WHERE 1 = 1
+    <if test="bUserId != null and bUserId != ''">
+      AND a.b_user_id = #{aUserId}
+    </if>
+    ORDER BY a.create_time
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from a_cashout_detail
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.wzkj.hzyp.entity.CashoutDetail" >
+    insert into a_cashout_detail (id, job_id, job_name, 
+      cashout_time, create_time, money, 
+      a_user_id, b_user_id)
+    values (#{id,jdbcType=VARCHAR}, #{jobId,jdbcType=VARCHAR}, #{jobName,jdbcType=VARCHAR}, 
+      #{cashoutTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{money,jdbcType=INTEGER}, 
+      #{aUserId,jdbcType=VARCHAR}, #{bUserId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wzkj.hzyp.entity.CashoutDetail" >
+    insert into a_cashout_detail
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="jobId != null" >
+        job_id,
+      </if>
+      <if test="jobName != null" >
+        job_name,
+      </if>
+      <if test="cashoutTime != null" >
+        cashout_time,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="money != null" >
+        money,
+      </if>
+      <if test="aUserId != null" >
+        a_user_id,
+      </if>
+      <if test="bUserId != null" >
+        b_user_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="jobId != null" >
+        #{jobId,jdbcType=VARCHAR},
+      </if>
+      <if test="jobName != null" >
+        #{jobName,jdbcType=VARCHAR},
+      </if>
+      <if test="cashoutTime != null" >
+        #{cashoutTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="money != null" >
+        #{money,jdbcType=INTEGER},
+      </if>
+      <if test="aUserId != null" >
+        #{aUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="bUserId != null" >
+        #{bUserId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wzkj.hzyp.entity.CashoutDetail" >
+    update a_cashout_detail
+    <set >
+      <if test="jobId != null" >
+        job_id = #{jobId,jdbcType=VARCHAR},
+      </if>
+      <if test="jobName != null" >
+        job_name = #{jobName,jdbcType=VARCHAR},
+      </if>
+      <if test="cashoutTime != null" >
+        cashout_time = #{cashoutTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="money != null" >
+        money = #{money,jdbcType=INTEGER},
+      </if>
+      <if test="aUserId != null" >
+        a_user_id = #{aUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="bUserId != null" >
+        b_user_id = #{bUserId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wzkj.hzyp.entity.CashoutDetail" >
+    update a_cashout_detail
+    set job_id = #{jobId,jdbcType=VARCHAR},
+      job_name = #{jobName,jdbcType=VARCHAR},
+      cashout_time = #{cashoutTime,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      money = #{money,jdbcType=INTEGER},
+      a_user_id = #{aUserId,jdbcType=VARCHAR},
+      b_user_id = #{bUserId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

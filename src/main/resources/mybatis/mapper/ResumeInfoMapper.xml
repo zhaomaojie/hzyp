@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wzkj.hzyp.dao.mybatis.ResumeInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.wzkj.hzyp.entity.ResumeInfo" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="avatar" property="avatar" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="gender" property="gender" jdbcType="INTEGER" />
+    <result column="age" property="age" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="del_flag" property="delFlag" jdbcType="INTEGER" />
+    <result column="a_user_id" property="aUserId" jdbcType="VARCHAR" />
+    <result column="education_degree" property="educationDegree" jdbcType="INTEGER" />
+    <result column="work_experience" property="workExperience" jdbcType="INTEGER" />
+    <result column="university" property="university" jdbcType="VARCHAR" />
+    <result column="native_place" property="nativePlace" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="past_work" property="pastWork" jdbcType="VARCHAR" />
+    <result column="intentional_work" property="intentionalWork" jdbcType="VARCHAR" />
+
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, avatar, name, phone, gender, age, create_time, update_time, del_flag, a_user_id, 
+    education_degree, work_experience, university, native_place, status,past_work,intentional_work
+  </sql>
+
+  <select id="getResumeList" resultMap="BaseResultMap">
+    SELECT *
+    FROM C_RESUME_INFO a
+    WHERE 1 = 1
+    <if test="id != null and id !=''">
+      AND a.a_user_id = #{id}
+    </if>
+
+    <if test="name != null and name != ''">
+      AND a.name LIKE "%"#{name}"%"
+    </if>
+
+    <if test="phone != null and phone != ''">
+      AND a.phone LIKE "%"#{phone}"%"
+    </if>
+
+    ORDER BY a.create_time DESC
+
+  </select>
+
+  <select id="pushResumeList" resultType="java.util.HashMap">
+    SELECT
+	a.id receviedId,
+	a.latest_feedback latestFeedback ,
+    a.job_id jobId,
+    a.create_time receviedTime,
+	b.*
+    FROM
+	b_recevied_info a
+    INNER JOIN c_resume_info b ON a.resume_id = b.id
+    WHERE
+	1 = 1
+
+    <if test="aUserId != null and aUserId != ''">
+       AND a.a_user_id = #{aUserId}
+    </if>
+    <if test="jobId != null and jobId != ''">
+       AND a.job_id = #{jobId}
+    </if>
+    <if test="status != null ">
+      AND a.status = #{status}
+    </if>
+    <if test="name != null and name != ''">
+       AND b.name LIKE "%"#{name}"%"
+    </if>
+    <if test="phone != null and phone != ''">
+      AND b.phone LIKE "%"#{phone}"%"
+    </if>
+
+    ORDER BY a.create_time DESC
+  </select>
+
+  <select id="resumeList" resultMap="BaseResultMap">
+    SELECT *
+    FROM C_RESUME_INFO a
+    WHERE 1 = 1
+    <if test="aUserId != null and aUserId !=''">
+      AND a.a_user_id = #{aUserId}
+    </if>
+
+    <if test="status != null and status !=''">
+      AND a.status = #{status}
+    </if>
+
+    <if test="name != null and name != ''">
+      AND a.name LIKE "%"#{name}"%"
+    </if>
+
+    <if test="phone != null and phone != ''">
+      AND a.phone LIKE "%"#{phone}"%"
+    </if>
+
+    ORDER BY a.create_time DESC
+
+  </select>
+
+  <select id="resumeRecord" resultType="java.util.HashMap">
+    SELECT
+	a.job_name jobName,b.create_time time,b.latest_feedback statusContent,c.`name` storeName
+    FROM
+	b_job_info a
+    INNER JOIN b_recevied_info b ON a.id = b.job_id
+    LEFT JOIN b_store_info c ON a.b_store_id = c.id
+    WHERE 1 = 1
+    <if test="resumeId != null and resumeId != ''">
+      AND b.resume_id = #{resumeId}
+    </if>
+    ORDER BY time ASC
+
+  </select>
+
+  <select id="myCandidate" resultType="java.util.HashMap">
+    SELECT
+	a.id receviedId,
+	a.latest_feedback latestFeedback,
+	a.create_time receviedTime,
+	b.id resumeId,
+    b.`status`,
+	c.job_name jobName,
+	c.id jobId
+    FROM
+	b_recevied_info a
+    INNER JOIN c_resume_info b ON a.resume_id = b.id
+    LEFT JOIN b_job_info c ON a.job_id = c.id
+    WHERE  1 = 1
+    <if test="bUserId != null and bUserId != ''">
+      AND a.b_user_id = #{bUserId}
+    </if>
+    <if test="status != null">
+      AND a.status = #{status}
+    </if>
+    <if test="name != null and name != ''">
+      AND b.name LIKE "%"#{name}"%"
+    </if>
+    <if test="phone != null and phone != ''">
+      AND b.phone LIKE "%"#{phone}"%"
+    </if>
+    ORDER BY a.create_time ASC
+  </select>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from c_resume_info
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from c_resume_info
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.wzkj.hzyp.entity.ResumeInfo" >
+    insert into c_resume_info (id, avatar, name, 
+      phone, gender, age, 
+      create_time, update_time, del_flag, 
+      a_user_id, education_degree, work_experience, 
+      university, native_place, status,past_work,intentional_work
+      )
+    values (#{id,jdbcType=VARCHAR}, #{avatar,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{phone,jdbcType=VARCHAR}, #{gender,jdbcType=INTEGER}, #{age,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{delFlag,jdbcType=INTEGER}, 
+      #{aUserId,jdbcType=VARCHAR}, #{educationDegree,jdbcType=INTEGER}, #{workExperience,jdbcType=INTEGER}, 
+      #{university,jdbcType=VARCHAR}, #{nativePlace,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
+      #{pastWork,jdbcType=VARCHAR},#{intentionalWork,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.wzkj.hzyp.entity.ResumeInfo" >
+    insert into c_resume_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="avatar != null" >
+        avatar,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="gender != null" >
+        gender,
+      </if>
+      <if test="age != null" >
+        age,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="delFlag != null" >
+        del_flag,
+      </if>
+      <if test="aUserId != null" >
+        a_user_id,
+      </if>
+      <if test="educationDegree != null" >
+        education_degree,
+      </if>
+      <if test="workExperience != null" >
+        work_experience,
+      </if>
+      <if test="university != null" >
+        university,
+      </if>
+      <if test="nativePlace != null" >
+        native_place,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="pastWork != null" >
+        past_work,,
+      </if>
+
+      <if test="intentionalWork != null" >
+        intentional_work,
+      </if>
+
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="avatar != null" >
+        #{avatar,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="gender != null" >
+        #{gender,jdbcType=INTEGER},
+      </if>
+      <if test="age != null" >
+        #{age,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlag != null" >
+        #{delFlag,jdbcType=INTEGER},
+      </if>
+      <if test="aUserId != null" >
+        #{aUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="educationDegree != null" >
+        #{educationDegree,jdbcType=INTEGER},
+      </if>
+      <if test="workExperience != null" >
+        #{workExperience,jdbcType=INTEGER},
+      </if>
+      <if test="university != null" >
+        #{university,jdbcType=VARCHAR},
+      </if>
+      <if test="nativePlace != null" >
+        #{nativePlace,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="pastWork != null" >
+        #{pastWork,jdbcType=VARCHAR},
+      </if>
+
+      <if test="intentionalWork != null" >
+        #{intentionalWork,jdbcType=VARCHAR},
+      </if>
+
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wzkj.hzyp.entity.ResumeInfo" >
+    update c_resume_info
+    <set >
+      <if test="avatar != null" >
+        avatar = #{avatar,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="gender != null" >
+        gender = #{gender,jdbcType=INTEGER},
+      </if>
+      <if test="age != null" >
+        age = #{age,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlag != null" >
+        del_flag = #{delFlag,jdbcType=INTEGER},
+      </if>
+      <if test="aUserId != null" >
+        a_user_id = #{aUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="educationDegree != null" >
+        education_degree = #{educationDegree,jdbcType=INTEGER},
+      </if>
+      <if test="workExperience != null" >
+        work_experience = #{workExperience,jdbcType=INTEGER},
+      </if>
+      <if test="university != null" >
+        university = #{university,jdbcType=VARCHAR},
+      </if>
+      <if test="nativePlace != null" >
+        native_place = #{nativePlace,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="pastWork != null" >
+        past_work, = #{pastWork,jdbcType=VARCHAR},
+      </if>
+
+      <if test="intentionalWork != null" >
+        intentional_work = #{intentionalWork,jdbcType=VARCHAR},
+      </if>
+
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wzkj.hzyp.entity.ResumeInfo" >
+    update c_resume_info
+    set avatar = #{avatar,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      gender = #{gender,jdbcType=INTEGER},
+      age = #{age,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      del_flag = #{delFlag,jdbcType=INTEGER},
+      a_user_id = #{aUserId,jdbcType=VARCHAR},
+      education_degree = #{educationDegree,jdbcType=INTEGER},
+      work_experience = #{workExperience,jdbcType=INTEGER},
+      university = #{university,jdbcType=VARCHAR},
+      native_place = #{nativePlace,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER}
+      past_work, = #{pastWork,jdbcType=VARCHAR},
+      intentional_work, = #{intentionalWork,jdbcType=VARCHAR},
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

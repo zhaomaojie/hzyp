@@ -1,0 +1,197 @@
+server:
+  port: 8081
+#  servlet:
+#    context-path: /syp
+spring:
+# 最大上传文件大小
+  servlet:
+    multipart:
+      max-file-size: "500MB"
+#当前环境
+  profiles:
+    active: local
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/hzyp?serverTimezone=GMT%2b8&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useOldAliasMetadataBehavior=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    # 初始化大小，最小，最大
+    initialSize: 20
+    minIdle: 20
+    maxActive: 100
+    # 配置获取连接等待超时的时间
+    maxWait: 60000
+    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+    timeBetweenEvictionRunsMillis: 60000
+    # 配置一个连接在池中最小生存的时间，单位是毫秒
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    # 打开PSCache，并且指定每个连接上PSCache的大小 poolPreparedStatements false,下面对应的参数无效。
+    poolPreparedStatements: false
+    maxPoolPreparedStatementPerConnectionSize: 20
+   # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+    filters: stat,wall,log4j
+    logSlowSql: true
+    # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+    # 合并多个DruidDataSource的监控数据
+    useGlobalDataSourceStat: true
+  redis:
+    database: 0
+    host: 127.0.0.1
+    port: 6379
+    password:
+    lettuce:
+      pool:
+        max-active: 500
+        max-wait: -1
+        max-idle: 30
+    timeout: 3000
+
+
+  jpa:
+      hibernate:
+        ddl-auto: update
+      show-sql: true
+  mvc:
+    static-path-pattern:
+
+#mybatis基础配置
+mybatis:
+  config-location: classpath:mybatis/mybatis-config.xml
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  type-aliases-package: com.wzkj.hzyp.entity
+
+# mybatis分页插件
+pagehelper:
+    helperDialect: mysql
+    reasonable: true
+    supportMethodsArguments: true
+    params: count=countSql
+
+logging:
+  config: classpath:logback.xml  ## 日志
+
+
+
+project:
+  name: 赏易聘
+  config:
+    isdebug: true
+  aliyun_sms:
+    app_id: LTAIuDKu5Jaj9C7P
+    app_secret: XAUK4143XZ6va8786WQSzU4MkWoW1F
+    region: cn-hangzhou
+    sign: 街聘
+    val_code_template: SMS_155225079
+    val_code_param: code
+
+  oss:
+    endpoint: http://oss-cn-hangzhou.aliyuncs.com
+    accessKeyId: LTAIp5qogZwmcLpe
+    accessKeySecret: nZAPTRNSxmSnn9wuNIGxPloX3dV2Vc
+    bucketName: sypupload
+    folder : storeImg
+    webUrl: https://sypupload.oss-cn-hangzhou.aliyuncs.com
+#  aliyun_sms:
+#    accessKeyId: LTAIzmtNRsDxODPn
+#    accessKeySecret: g9V3dQjInqeqVoHxukWCofqFEDkX9q
+#    product: cn-Dysmsapi
+#    domain: dysmsapi.aliyuncs.com
+#    regionId: cn-hangzhou
+#    signName: 街聘
+#    dateFormat: yyyyMMdd
+#    endpointName: cn-hangzhou
+
+    #--------阿里云短信配置参数 start--------------#
+    #阿里云 accessKeyId（安全信息管理下面）
+#    aliyun.sms.accessKeyId=*******
+#    #阿里云 accessKeySecret（安全信息管理下面）
+#    aliyun.sms.accessKeySecret=********
+#    #产品名称:云通信短信API产品,开发者无需替换
+#    aliyun.sms.product=Dysmsapi
+#    #产品域名,开发者无需替换
+#    aliyun.sms.domain=dysmsapi.aliyuncs.com
+#    aliyun.sms.regionId=cn-hangzhou
+#    #短信签名名称（国内/国际/港澳台消息-签名管理下面）
+#    aliyun.sms.signName=****
+#    #发送日期 支持30天内记录查询，格式yyyyMMdd
+#    aliyun.sms.dateFormat=yyyyMMdd
+#    #服务结点
+#    aliyun.sms.endpointName=cn-hangzhou
+    #--------阿里云短信配置参数 end--------------#
+
+#  oss:
+#    endpoint: http://oss-cn-hangzhou.aliyuncs.com
+#    access_key_id: LTAIkIkHmeTP2Xpj
+#    access_key_secret: rqjojQK6w417GKqkEznLja7DihZ84T
+#    backet_name: jiepinupload
+#    file_server: http://jiepinupload.oss-cn-hangzhou.aliyuncs.com
+
+#  aliyun_sms:
+#    app_id: LTAIuDKu5Jaj9C7P
+#    app_secret: XAUK4143XZ6va8786WQSzU4MkWoW1F
+#    region: cn-hangzhou
+#    sign: 街聘
+#    val_code_template: SMS_155225079
+#    val_code_param: code
+  weixin:
+    mp_app_id: wx5666e9599cc559e6
+    mp_app_secret: 05b9cf4e5a843dd2c314f666e742d886
+    #推送简历模板消息
+    pushResumeTemplate: TS3G8FWhMVvtvX1wxg25yJmD0mkvA8JEj9W3WyPDnZY
+
+
+
+############## 上面为默认配置，如要根据环境发布配置对应环境的相应配置项，修改下面对应profiles配置项######################
+
+---
+spring:
+  profiles: local
+logging:
+  config: classpath:logback.xml  ## 日志
+
+---
+spring:
+  profiles: dev
+logging:
+  config: classpath:logback-pro.xml  ## 日志
+
+#---
+#spring:
+#  profiles: dev
+#project:
+#  config:
+#    fileServer: http://jiepinfile.oss-cn-hangzhou.aliyuncs.com/dev/backend
+#    posterpath: /home/poster_img_dev
+#    poster_visit_url: http://posterdev.jiepinhr.com
+#    mobileSite: http://m.jiepin.wywzjs.com
+
+#---
+#spring:
+#  profiles: pro
+#  datasource:
+#    url: jdbc:mysql://127.0.0.1:3306/jiepin_live?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useOldAliasMetadataBehavior=true
+#    username: jiepin_live
+#    password: 2CThrBFec7yJBXbT
+#logging:
+#  config: classpath:logback-pro.xml  ## 日志
+#project:
+#  name: jiepin_live
+#  config:
+#    isDebug: false
+#    fileServer: http://jiepinfile.oss-cn-hangzhou.aliyuncs.com/live/backend
+#    fileVersion: ?v=1.0.3
+#    mobileSite: https://m.jiepinhr.com
+#    posterpath: /home/poster_img_live
+#    poster_visit_url: http://poster.jiepinhr.com
+
+
+
+
+
+
