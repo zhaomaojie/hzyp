@@ -41,6 +41,9 @@ public class WxTemplateServiceImpl implements WxTemplateService {
     @Value("${project.weixin.pushResumeTemplate}")
     private String pushResumeTemplate;
 
+    @Value("${project.weixin.pushResumeJumpPages}")
+    private String pushResumeJumpPages;
+
     @Override
     public String getAccessToken() {
         String accessTokenUrl = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + APPID
@@ -101,7 +104,7 @@ public class WxTemplateServiceImpl implements WxTemplateService {
                 .formId(formId)//收集到的formid
                 .templateId(pushResumeTemplate)//推送的模版id（在小程序后台设置）
                 .data(templateDataList)//模版信息
-                .page("pages/index/index")//要跳转到小程序那个页面
+                .page(pushResumeJumpPages)//要跳转到小程序那个页面
                 .build();
 
         //4，发起推送

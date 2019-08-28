@@ -54,7 +54,10 @@ public class AUserVO {
     private Integer isLogin;
 
     /** 是否注册  0是  1否*/
-    private Integer isRegistr;
+    private Integer isRegister;
+
+    /** 用户类型 A */
+    private Integer type;
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
@@ -247,11 +250,19 @@ public class AUserVO {
         this.isLogin = isLogin;
     }
 
-    public Integer getIsRegistr() {
-        return isRegistr;
+    public Integer getIsRegister() {
+        return isRegister;
     }
 
-    public void setIsRegistr(Integer isRegistr) {
-        this.isRegistr = isRegistr;
+    public void setIsRegister(Integer isRegister) {
+        this.isRegister = isRegister;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 }

@@ -121,7 +121,7 @@ public class StoreInfoController extends BaseController {
                     os.close();
                     file.transferTo(newFile);
                     // 上传到OSS
-                    FileEntity fileEntity =  aliyunOSSUtil.uploadFile(newFile);
+                    FileEntity fileEntity =  aliyunOSSUtil.uploadFile(newFile,"store");
                     if(fileEntity == null){
                         return new AjaxResponse(ResponseCode.APP_FAIL,"上传失败！");
                     }
@@ -130,6 +130,7 @@ public class StoreInfoController extends BaseController {
                     String courseFile = directory.getCanonicalPath() ;
                     String path = courseFile + "\\" + filename;
                     FileUtil.deleteFile(path);
+                    //返回地址
                     String webUrl = fileEntity.getWebUrl();
                     return new AjaxResponse(ResponseCode.APP_SUCCESS,webUrl);
                 }

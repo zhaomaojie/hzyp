@@ -39,6 +39,13 @@ public interface ProcessInfoService {
      */
     List<ProcessInfo> getProcessInfoByReceviedId(String receviedId);
 
+    /* *
+     * 根据receviedI的获取
+     * @author zhaoMaoJie
+     * @date 2019/8/26 0026
+     */
+    Integer getNewSortNumber(String receviedId);
+
 
 
 }

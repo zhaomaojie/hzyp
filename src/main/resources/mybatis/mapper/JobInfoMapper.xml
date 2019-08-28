@@ -30,6 +30,42 @@
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
         <result column="label" property="label" jdbcType="INTEGER"/>
     </resultMap>
+
+    <resultMap id="JobInfoVO" type="com.wzkj.hzyp.vo.JobInfoVO">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="b_store_id" property="bStoreId" jdbcType="VARCHAR"/>
+        <result column="b_user_id" property="bUserId" jdbcType="VARCHAR"/>
+        <result column="industry_code" property="industryCode" jdbcType="VARCHAR"/>
+        <result column="job_name" property="jobName" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="num" property="num" jdbcType="INTEGER"/>
+        <result column="education_degree" property="educationDegree" jdbcType="INTEGER"/>
+        <result column="work_experience" property="workExperience" jdbcType="INTEGER"/>
+        <result column="age_min" property="ageMin" jdbcType="INTEGER"/>
+        <result column="age_max" property="ageMax" jdbcType="INTEGER"/>
+        <result column="probation" property="probation" jdbcType="INTEGER"/>
+        <result column="trial_time" property="trialTime" jdbcType="VARCHAR"/>
+        <result column="trial_salary" property="trialSalary" jdbcType="VARCHAR"/>
+        <result column="official_salary" property="officialSalary" jdbcType="VARCHAR"/>
+        <result column="avg_salary" property="avgSalary" jdbcType="VARCHAR"/>
+        <result column="interview_time" property="interviewTime" jdbcType="VARCHAR"/>
+        <result column="reward" property="reward" jdbcType="INTEGER"/>
+        <result column="overtime" property="overtime" jdbcType="INTEGER"/>
+        <result column="total_amount" property="totalAmount" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="del_flag" property="delFlag" jdbcType="INTEGER"/>
+        <result column="recevied_resume_number" property="receviedResumeNumber" jdbcType="INTEGER"/>
+        <result column="total_resume_number" property="totalResumeNumber" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="label" property="label" jdbcType="INTEGER"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="logo" property="logo" jdbcType="VARCHAR"/>
+        <result column="storeName" property="storeName" jdbcType="VARCHAR"/>
+        <result column="recriptTime" property="recriptTime" jdbcType="TIMESTAMP"/>
+        <result column="collectionJobStatus" property="collectionJobStatus" jdbcType="INTEGER"/>
+
+    </resultMap>
     <sql id="Base_Column_List">
     id, b_store_id, b_user_id, industry_code, job_name, description, num, education_degree, 
     work_experience, age_min,age_max, probation, trial_time, trial_salary, official_salary, avg_salary,
@@ -37,7 +73,7 @@
     total_resume_number, create_time, update_time, label
   </sql>
 
-    <select id="getJobList" resultType="java.util.HashMap">
+    <select id="getJobList" resultMap="JobInfoVO" >
         SELECT
         a.id,
         a.job_name jobName,
@@ -76,7 +112,7 @@
         ORDER BY a.create_time DESC
     </select>
 
-    <select id="jobDetail" resultType="java.util.HashMap">
+    <select id="jobDetail" resultMap="JobInfoVO">
         SELECT
         a.id,
         a.job_name jobName,
@@ -111,7 +147,7 @@
         </if>
     </select>
 
-    <select id="collectionJobList" resultType="java.util.HashMap">
+    <select id="collectionJobList" resultMap="JobInfoVO">
         SELECT
         a.id,
         a.job_name jobName,
@@ -147,7 +183,7 @@
         </if>
     </select>
 
-    <select id="publishJobList" resultType="java.util.HashMap">
+    <select id="publishJobList" resultMap="JobInfoVO">
         SELECT
         a.id,
         a.job_name jobName,

@@ -50,7 +50,7 @@ public class ResumeInfo {
     private Integer delFlag;
 
     /** a端用户标识 */
-    @Column(name = "A_USER_INFO")
+    @Column(name = "A_USER_ID")
     private String aUserId;
 
     /** 学历 */

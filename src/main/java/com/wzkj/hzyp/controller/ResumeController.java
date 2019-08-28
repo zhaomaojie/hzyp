@@ -9,6 +9,7 @@ import com.wzkj.hzyp.common.AjaxResponse;
 import com.wzkj.hzyp.common.ResponseCode;
 import com.wzkj.hzyp.entity.*;
 import com.wzkj.hzyp.service.*;
+import com.wzkj.hzyp.utils.DateUtil;
 import com.wzkj.hzyp.utils.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -77,7 +79,7 @@ public class ResumeController extends BaseController {
             String userId = auserInfo.getId();
             ResumeInfo resumeInfo = new ResumeInfo();
             resumeInfo.setName(name);
-            resumeInfo.setPhone(phone);
+            resumeInfo.setPhone(phone.toString());
             resumeInfo.setGender(gender);
             resumeInfo.setAge(age);
             resumeInfo.setCreateTime(new Date());
@@ -92,11 +94,14 @@ public class ResumeController extends BaseController {
             resumeInfo.setPastWork(pastWork);
             resumeInfo.setIntentionalWork(intentionalWork);
             resumeInfoService.saveResume(resumeInfo);
-            return new AjaxResponse(ResponseCode.APP_SUCCESS);
+            String newId = resumeInfo.getId();
+            Map<String,Object> map = new HashMap();
+            map.put("id",newId);
+            return new AjaxResponse(ResponseCode.APP_SUCCESS,"新增成功",map);
         }else {
             ResumeInfo resume = resumeInfoService.getResumeById(id);
             resume.setName(name);
-            resume.setPhone(phone);
+            resume.setPhone(phone.toString());
             resume.setGender(gender);
             resume.setAge(age);
             resume.setUpdateTime(new Date());
@@ -107,8 +112,32 @@ public class ResumeController extends BaseController {
             resume.setPastWork(pastWork);
             resume.setIntentionalWork(intentionalWork);
             resumeInfoService.saveResume(resume);
-            return new AjaxResponse(ResponseCode.APP_SUCCESS);
+            String newId = resume.getId();
+            Map<String,Object> map = new HashMap();
+            map.put("id",newId);
+            return new AjaxResponse(ResponseCode.APP_SUCCESS,"修改成功",map);
         }
+    }
+
+    /* *
+     * 绑定头像
+     * @author zhaoMaoJie
+     * @date 2019/8/7 0007
+     */
+    @RequestMapping(value = "/bindingAvatar",method = RequestMethod.POST)
+    @ResponseBody
+    public AjaxResponse bindingAvatar(String id,MultipartFile file ){
+        if(StringUtils.isBlank(id) || file.isEmpty()){
+            return new AjaxResponse(ResponseCode.APP_FAIL,"参数有误！");
+        }
+        // 执行绑定头像 首先判空 然后 上传头像得到webURL地址 然后绑定到简历
+        boolean isBind = resumeInfoService.bindingAvatar(id, file);
+        if(isBind){
+            return new AjaxResponse(ResponseCode.APP_SUCCESS,"绑定成功！");
+        }else {
+            return new AjaxResponse(ResponseCode.APP_FAIL,"绑定失败！");
+        }
+
     }
 
     /* *
@@ -185,6 +214,8 @@ public class ResumeController extends BaseController {
             String processContent = resumeInfo.getName() + "将于" + interviewDate + interviewTime + "参加面试";
             processInfo.setProcessContent(processContent);
             processInfo.setOwner(0);
+//            Integer sortNumber =  processInfoService.getNewSortNumber(receviedId);
+            processInfo.setSortNumber(1);
             processInfoService.saveProcessInfo(processInfo);
             //推送成功后改变原始岗位的简历数 收藏岗位的状态 B端接收简历表加入数据 流程表加入内容
             //改变岗位收到的简历数
@@ -205,7 +236,7 @@ public class ResumeController extends BaseController {
             map.put("date",interviewDate);
             map.put("time",interviewTime);
             map.put("address",address);
-            //给B端发送模板消息
+            //给B端发送模板消息 start
             //1,配置小程序信息
             WxMaInMemoryConfig wxConfig = wxTemplateService.getWxConfig();
             WxMaService wxMaService = new WxMaServiceImpl();
@@ -216,7 +247,7 @@ public class ResumeController extends BaseController {
             WxMaTemplateData data2 = new WxMaTemplateData("keyword2", resumeInfo.getGender() == 0 ? "男" : "女");
             WxMaTemplateData data3 = new WxMaTemplateData("keyword3", resumeInfo.getAge().toString());
             WxMaTemplateData data4 = new WxMaTemplateData("keyword4", jobInfo.getJobName());
-            WxMaTemplateData data5 = new WxMaTemplateData("keyword5", receviedInfo.getCreateTime().toString());
+            WxMaTemplateData data5 = new WxMaTemplateData("keyword5", DateUtil.dateToString(receviedInfo.getCreateTime()));
             templateDataList.add(data1);
             templateDataList.add(data2);
             templateDataList.add(data3);
@@ -231,6 +262,7 @@ public class ResumeController extends BaseController {
             }else {
                 map.put("isTemplate",false);
             }
+            //给B端发送模板消息 end
             return new AjaxResponse(ResponseCode.APP_SUCCESS,map);
         }
     }

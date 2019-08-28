@@ -14,6 +14,13 @@ public interface ProcessInfoMapper {
      * @date 2019/8/7 0007
      */
     List<ProcessInfo> getProcessInfoByReceviedId(@Param("receviedId") String receviedId);
+
+    /* *
+     * 根据receviedI的获取
+     * @author zhaoMaoJie
+     * @date 2019/8/26 0026
+     */
+    Integer getNewSortNumber(@Param("receviedId") String receviedId);
     int deleteByPrimaryKey(String id);
 
     int insert(ProcessInfo record);

@@ -4,6 +4,7 @@ import com.wzkj.hzyp.entity.CollectionJob;
 import com.wzkj.hzyp.entity.JobInfo;
 import com.wzkj.hzyp.entity.JpCityInfo;
 import com.wzkj.hzyp.entity.JpIndustryInfo;
+import com.wzkj.hzyp.vo.JobInfoVO;
 
 import java.util.List;
 import java.util.Map;
@@ -19,15 +20,14 @@ public interface JobInfoService {
      * @author zhaoMaoJie
      * @date 2019/7/22 0022
      */
-    List<Map<String,Object>> getJobList(String keyWord, Integer label);
+    List<JobInfoVO> getJobList(String keyWord, Integer label);
 
     /* *
      * 根据id获取岗位详情
      * @author zhaoMaoJie
      * @date 2019/8/4 0004
      */
-    @org.apache.ibatis.annotations.MapKey("id")
-    Map<String,Object> jobDetail(String jobId);
+    JobInfoVO jobDetail(String jobId);
 
     /* *
      * 收藏岗位
@@ -69,14 +69,14 @@ public interface JobInfoService {
      * @author zhaoMaoJie
      * @date 2019/8/6 0006
      */
-    List<Map<String,Object>> collectionJobList(String aUserId,Integer status);
+    List<JobInfoVO> collectionJobList(String aUserId,Integer status);
 
     /* *
      * 获取B端发布的岗位
      * @author zhaoMaoJie
      * @date 2019/8/9 0009
      */
-    List<Map<String,Object>> publishJobList(String bUserId,String jobName,Integer status);
+    List<JobInfoVO> publishJobList(String bUserId,String jobName,Integer status);
 
     /* *
      * 更改岗位状态

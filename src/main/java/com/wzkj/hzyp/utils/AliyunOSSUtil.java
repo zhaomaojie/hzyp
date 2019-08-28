@@ -37,14 +37,19 @@ public class AliyunOSSUtil {
      * @author zhaoMaoJie
      * @date 2019/8/9 0009
      */
-    public FileEntity uploadFile(File file) {
+    public FileEntity uploadFile(File file,String userInfo) {
         //获取配置文件属性
         String endpoint = aliyunOSSconfig.getEndpoint();
         String accessKeyId = aliyunOSSconfig.getAccessKeyId();
         String accessKeySecret = aliyunOSSconfig.getAccessKeySecret();
         String bucketName = aliyunOSSconfig.getBucketName();
-        String folder = aliyunOSSconfig.getFolder();
-        String webUrl = aliyunOSSconfig.getWebUrl();
+        String folder = null;
+        //选择不同的存储空间
+        if(userInfo != null && userInfo.equals("user")){
+            folder = aliyunOSSconfig.getUserFolder();
+        }else {
+            folder = aliyunOSSconfig.getStoreFolder();
+        }
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String dateStr = format.format(new Date());
         String uuid = UUID.randomUUID().toString().replace("-", "");

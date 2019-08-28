@@ -1,5 +1,7 @@
 package com.wzkj.hzyp.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -110,7 +112,8 @@ public class JobInfo implements java.io.Serializable{
     private Integer totalResumeNumber;
 
     /** 创建时间 */
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     @Column(name = "CREATE_TIME")
     private Date createTime;
 
@@ -300,6 +303,7 @@ public class JobInfo implements java.io.Serializable{
         this.totalResumeNumber = totalResumeNumber;
     }
 
+
     public Date getCreateTime() {
         return createTime;
     }
@@ -308,6 +312,7 @@ public class JobInfo implements java.io.Serializable{
         this.createTime = createTime;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     public Date getUpdateTime() {
         return updateTime;
     }

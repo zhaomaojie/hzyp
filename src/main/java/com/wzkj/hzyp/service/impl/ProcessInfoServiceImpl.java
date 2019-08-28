@@ -47,4 +47,11 @@ public class ProcessInfoServiceImpl implements ProcessInfoService {
         List<ProcessInfo> processInfoList = processInfoMapper.getProcessInfoByReceviedId(receviedId);
         return processInfoList;
     }
+
+    @Override
+    public Integer getNewSortNumber(String receviedId) {
+        Integer sortNumber = processInfoMapper.getNewSortNumber(receviedId);
+        sortNumber += 1;
+        return sortNumber;
+    }
 }

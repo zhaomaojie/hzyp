@@ -95,7 +95,8 @@ project:
     accessKeyId: LTAIp5qogZwmcLpe
     accessKeySecret: nZAPTRNSxmSnn9wuNIGxPloX3dV2Vc
     bucketName: sypupload
-    folder : storeImg
+    storeFolder : storeImg
+    userFolder: avatar
     webUrl: https://sypupload.oss-cn-hangzhou.aliyuncs.com
 #  aliyun_sms:
 #    accessKeyId: LTAIzmtNRsDxODPn
@@ -144,6 +145,8 @@ project:
     mp_app_secret: 05b9cf4e5a843dd2c314f666e742d886
     #推送简历模板消息
     pushResumeTemplate: TS3G8FWhMVvtvX1wxg25yJmD0mkvA8JEj9W3WyPDnZY
+    #B端进入小程序的页面 接收新简历 待定
+    pushResumeJumpPages: pages/customer/main/main
 
 
 

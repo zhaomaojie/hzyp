@@ -52,10 +52,14 @@
 	a.latest_feedback latestFeedback ,
     a.job_id jobId,
     a.create_time receviedTime,
-	b.*
+	b.id resumeId,
+    b.name,
+    b.avatar,
+    c.job_name jobName
     FROM
 	b_recevied_info a
     INNER JOIN c_resume_info b ON a.resume_id = b.id
+    LEFT JOIN b_job_info c ON a.job_id = c.id
     WHERE
 	1 = 1
 
@@ -86,7 +90,7 @@
       AND a.a_user_id = #{aUserId}
     </if>
 
-    <if test="status != null and status !=''">
+    <if test="status != null ">
       AND a.status = #{status}
     </if>
 

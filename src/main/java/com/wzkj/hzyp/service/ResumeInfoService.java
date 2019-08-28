@@ -2,6 +2,7 @@ package com.wzkj.hzyp.service;
 
 import com.wzkj.hzyp.entity.ReceviedInfo;
 import com.wzkj.hzyp.entity.ResumeInfo;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -83,4 +84,11 @@ public interface ResumeInfoService {
      * @date 2019/8/11 0011
      */
     List<Map<String,Object>> myCandidate(String bUserId,Integer status,String name,String phone);
+
+    /* *
+     * 绑定头像到简历页
+     * @author zhaoMaoJie
+     * @date 2019/8/26 0026
+     */
+    boolean bindingAvatar(String id,MultipartFile file);
 }

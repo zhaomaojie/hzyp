@@ -11,6 +11,7 @@ import com.wzkj.hzyp.entity.JpCityInfo;
 import com.wzkj.hzyp.entity.JpIndustryInfo;
 import com.wzkj.hzyp.service.JobInfoService;
 import com.wzkj.hzyp.utils.StringUtils;
+import com.wzkj.hzyp.vo.JobInfoVO;
 import org.apache.ibatis.annotations.MapKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,15 +45,14 @@ public class JobInfoServiceImpl implements JobInfoService {
     private JobInfoMapper mapper;
 
     @Override
-    public List<Map<String,Object>> getJobList(String keyWord, Integer label) {
-        List<Map<String,Object>> list = mapper.getJobList(keyWord,label);
+    public List<JobInfoVO> getJobList(String keyWord, Integer label) {
+        List<JobInfoVO> list = mapper.getJobList(keyWord,label);
         return list;
     }
 
     @Override
-    @MapKey("id")
-    public Map<String,Object> jobDetail(String jobId) {
-        Map<String,Object> jobInfo = mapper.jobDetail(jobId);
+    public JobInfoVO jobDetail(String jobId) {
+        JobInfoVO jobInfo = mapper.jobDetail(jobId);
         return jobInfo;
     }
 
@@ -97,14 +97,14 @@ public class JobInfoServiceImpl implements JobInfoService {
     }
 
     @Override
-    public List<Map<String,Object>> collectionJobList(String aUserId,Integer status) {
-            List<Map<String,Object>> list = mapper.collectionJobList(aUserId, status);
+    public List<JobInfoVO> collectionJobList(String aUserId,Integer status) {
+        List<JobInfoVO> list = mapper.collectionJobList(aUserId, status);
             return list;
     }
 
     @Override
-    public List<Map<String, Object>> publishJobList(String bUserId, String jobName, Integer status) {
-        List<Map<String, Object>> list = mapper.publishJobList(bUserId, jobName, status);
+    public     List<JobInfoVO> publishJobList(String bUserId, String jobName, Integer status) {
+        List<JobInfoVO> list = mapper.publishJobList(bUserId, jobName, status);
         return list;
     }
 

@@ -45,13 +45,15 @@ public class UserController extends BaseController {
         Integer totalNumber = aUserService.getRecommenNumber(id);
         Integer successNum = aUserService.getEntrySuccessNumber(id);
         Integer noCashout = aUserService.getNoCashNumber(id);
-        Integer totalMoney = aUserService.getTotalMoney(id);
+        Integer noCashoutFormat = noCashout == null ? 0 : noCashout;
+        Integer totalMoney = aUserService.getTotalMoney(id) == null ? 0 : aUserService.getTotalMoney(id);
+        Integer totalMoneyFormat = totalMoney == null ? 0 : totalMoney;
         Map<String,Object> map = new HashMap();
         map.put("name",name);
         map.put("totalNumber",totalNumber);
         map.put("successNum",successNum);
-        map.put("noCashout",noCashout);
-        map.put("totalMoney",totalMoney);
+        map.put("noCashout",noCashoutFormat);
+        map.put("totalMoney",totalMoneyFormat);
         return new AjaxResponse(ResponseCode.APP_SUCCESS,map);
     }
 

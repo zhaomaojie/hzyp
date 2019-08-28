@@ -22,8 +22,11 @@ public class AliyunOSSconfig {
     @Value("${project.oss.bucketName}")
     private String bucketName;
 
-    @Value("${project.oss.folder}")
-    private String folder;
+    @Value("${project.oss.storeFolder}")
+    private String storeFolder;
+
+    @Value("${project.oss.userFolder}")
+    private String userFolder;
 
     @Value("${project.oss.webUrl}")
     private String webUrl;
@@ -60,12 +63,20 @@ public class AliyunOSSconfig {
         this.bucketName = bucketName;
     }
 
-    public String getFolder() {
-        return folder;
+    public String getStoreFolder() {
+        return storeFolder;
     }
 
-    public void setFolder(String folder) {
-        this.folder = folder;
+    public void setStoreFolder(String storeFolder) {
+        this.storeFolder = storeFolder;
+    }
+
+    public String getUserFolder() {
+        return userFolder;
+    }
+
+    public void setUserFolder(String userFolder) {
+        this.userFolder = userFolder;
     }
 
     public String getWebUrl() {

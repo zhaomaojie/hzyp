@@ -10,6 +10,7 @@ import com.wzkj.hzyp.entity.*;
 import com.wzkj.hzyp.service.JobInfoService;
 import com.wzkj.hzyp.service.StoreInfoService;
 import com.wzkj.hzyp.utils.StringUtils;
+import com.wzkj.hzyp.vo.JobInfoVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -51,7 +52,8 @@ public class JobController extends BaseController {
     @ApiOperation(value = "默认页面的岗位列表",notes = "A端获取发布的岗位信息")
     public AjaxResponse getJobList(Integer pageNum,Integer pageSize,String keyWord,Integer label){
         PageHelper.startPage(pageNum,pageSize);
-        List<Map<String,Object>> list = jobInfoService.getJobList(keyWord, label);
+        List<JobInfoVO> list = jobInfoService.getJobList(keyWord, label);
+//        System.out.println(list.get(0).get("createTime"));
         return new AjaxResponse(ResponseCode.APP_SUCCESS,list);
     }
 
@@ -63,8 +65,7 @@ public class JobController extends BaseController {
         if(StringUtils.isBlank(id)){
             return new AjaxResponse(ResponseCode.APP_FAIL,"id不能为空!");
         }else {
-            Map<String,Object> map = jobInfoService.jobDetail(id);
-            Map<String,Object> jobInfo = (Map<String,Object>) map.get(id);
+            JobInfoVO jobInfo = jobInfoService.jobDetail(id);
             return new AjaxResponse(ResponseCode.APP_SUCCESS,jobInfo);
         }
     }
@@ -88,6 +89,7 @@ public class JobController extends BaseController {
             String userId = auserInfo.getId();
             boolean isCollection = jobInfoService.isCollection(userId,id);
             //如果已经收藏过该岗位 则不能收复收藏
+            //这里暂时用来测试 取消校验是否收藏
             if(isCollection){
                 return new AjaxResponse(ResponseCode.APP_FAIL,"该岗位已被您收藏,请勿重复收藏!");
             }else {
@@ -123,7 +125,7 @@ public class JobController extends BaseController {
         AuserInfo auserInfo = getLoginUser();
         String userId = auserInfo.getId();
         PageHelper.startPage(pageNum,pageSize);
-        List<Map<String,Object>> list = jobInfoService.collectionJobList(userId,collectionJobStatus);
+        List<JobInfoVO> list = jobInfoService.collectionJobList(userId,collectionJobStatus);
         return new AjaxResponse(ResponseCode.APP_SUCCESS,list);
     }
 
@@ -142,7 +144,7 @@ public class JobController extends BaseController {
     public AjaxResponse publishJobList(Integer pageNum,Integer pageSize,String jobName,Integer status){
         String userId = getBuser().getId();
         PageHelper.startPage(pageNum,pageSize);
-        List<Map<String, Object>> list = jobInfoService.publishJobList(userId,jobName,status);
+        List<JobInfoVO> list = jobInfoService.publishJobList(userId,jobName,status);
         return new AjaxResponse(ResponseCode.APP_SUCCESS,list);
     }
 
