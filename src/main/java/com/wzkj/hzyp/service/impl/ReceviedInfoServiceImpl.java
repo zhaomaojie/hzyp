@@ -7,6 +7,7 @@ import com.wzkj.hzyp.service.ReceviedInfoService;
 import com.wzkj.hzyp.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @user zhaoMaoJie
@@ -31,12 +32,14 @@ public class ReceviedInfoServiceImpl implements ReceviedInfoService {
     }
 
     @Override
+    @Transactional
     public void deleteReceviedInfoById(String id) {
         ReceviedInfo receviedInfo = receviedInfoMapper.selectByPrimaryKey(id);
         receviedInfoRepository.delete(receviedInfo);
     }
 
     @Override
+    @Transactional
     public void saveReceviedInfo(ReceviedInfo receviedInfo) {
         if(receviedInfo != null){
             receviedInfoRepository.save(receviedInfo);

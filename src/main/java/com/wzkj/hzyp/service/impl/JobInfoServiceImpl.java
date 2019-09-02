@@ -57,6 +57,7 @@ public class JobInfoServiceImpl implements JobInfoService {
     }
 
     @Override
+    @Transactional
     public void collectionJob(CollectionJob collectionJob) {
         if(collectionJob != null){
             collectionJobInfoRepository.save(collectionJob);
@@ -83,6 +84,7 @@ public class JobInfoServiceImpl implements JobInfoService {
     }
 
     @Override
+    @Transactional
     public void saveJobInfo(JobInfo jobInfo) {
         if(jobInfo != null){
             jobInfoRepository.save(jobInfo);
@@ -90,6 +92,7 @@ public class JobInfoServiceImpl implements JobInfoService {
     }
 
     @Override
+    @Transactional
     public void changeCollectionStatus(String userId, String jobId,Integer status) {
         CollectionJob collectionJob = collectionJobInfoRepository.findByAUserIdAndAndJobId(userId, jobId);
         collectionJob.setStatus(status);

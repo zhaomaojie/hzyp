@@ -6,6 +6,7 @@ import com.wzkj.hzyp.entity.ProcessInfo;
 import com.wzkj.hzyp.service.ProcessInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ public class ProcessInfoServiceImpl implements ProcessInfoService {
     private ProcessInfoMapper processInfoMapper;
 
     @Override
+    @Transactional
     public void saveProcessInfo(ProcessInfo processInfo) {
         if(processInfo != null){
             processInfoRepository.save(processInfo);
@@ -37,6 +39,7 @@ public class ProcessInfoServiceImpl implements ProcessInfoService {
     }
 
     @Override
+    @Transactional
     public void deleteProcessById(String id) {
         ProcessInfo processInfo = processInfoMapper.selectByPrimaryKey(id);
         processInfoRepository.delete(processInfo);
@@ -49,6 +52,7 @@ public class ProcessInfoServiceImpl implements ProcessInfoService {
     }
 
     @Override
+    @Transactional
     public Integer getNewSortNumber(String receviedId) {
         Integer sortNumber = processInfoMapper.getNewSortNumber(receviedId);
         sortNumber += 1;

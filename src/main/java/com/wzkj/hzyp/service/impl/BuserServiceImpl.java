@@ -83,5 +83,11 @@ public class BuserServiceImpl implements BuserService {
         return null;
     }
 
+    @Override
+    public BuserInfo getBuserInfoByOpenId(String oepnId) {
+        BuserInfo buserInfo = bUserInfoRepository.findByOpenId(oepnId);
+        return buserInfo;
+    }
+
 
 }

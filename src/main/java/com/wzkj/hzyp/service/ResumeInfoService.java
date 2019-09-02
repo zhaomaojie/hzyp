@@ -2,6 +2,7 @@ package com.wzkj.hzyp.service;
 
 import com.wzkj.hzyp.entity.ReceviedInfo;
 import com.wzkj.hzyp.entity.ResumeInfo;
+import com.wzkj.hzyp.vo.ResumeRecordVO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -61,7 +62,7 @@ public interface ResumeInfoService {
      * @author zhaoMaoJie
      * @date 2019/8/7 0007
      */
-    List<Map<String,Object>> pushResumeList(String aUserId,String jobId,Integer status,String name,String phone);
+    List<Map<String,Object>> pushResumeList(String aUserId,String jobId,Integer status,String keyWord);
 
     /* *
      * A端 查看用户创建的简历列表
@@ -69,14 +70,14 @@ public interface ResumeInfoService {
      * @author zhaoMaoJie
      * @date 2019/8/7 0007
      */
-    List<ResumeInfo> resumeList(String userId,Integer status,String name,String phone);
+    List<ResumeInfo> resumeList(String userId,Integer status,String keyWord);
 
     /* *
      * A端 获取简历推荐记录
      * @author zhaoMaoJie
      * @date 2019/8/8 0008
      */
-    List<Map<String,Object>> resumeRecord(String resumeId);
+    List<ResumeRecordVO> resumeRecord(String resumeId);
 
     /* *
      * B端 获取我的候选人信息

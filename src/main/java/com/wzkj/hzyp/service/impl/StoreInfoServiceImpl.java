@@ -7,6 +7,7 @@ import com.wzkj.hzyp.service.StoreInfoService;
 import com.wzkj.hzyp.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @user zhaoMaoJie
@@ -31,6 +32,7 @@ public class StoreInfoServiceImpl implements StoreInfoService {
     }
 
     @Override
+    @Transactional
     public void saveStoreInfo(StoreInfo storeInfo) {
         if(storeInfo != null){
             storeInfoRepository.save(storeInfo);

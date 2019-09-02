@@ -6,6 +6,7 @@ import com.wzkj.hzyp.entity.EntryInfo;
 import com.wzkj.hzyp.service.EntryInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @user zhaoMaoJie
@@ -27,6 +28,7 @@ public class EntryInfoServiceImpl implements EntryInfoService {
     }
 
     @Override
+    @Transactional
     public void saveEntryInfo(EntryInfo entryInfo) {
         if(entryInfo != null){
             entryInfoRepository.save(entryInfo);

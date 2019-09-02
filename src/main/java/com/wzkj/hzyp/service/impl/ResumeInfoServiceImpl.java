@@ -14,6 +14,7 @@ import com.wzkj.hzyp.service.ResumeInfoService;
 import com.wzkj.hzyp.utils.AliyunOSSUtil;
 import com.wzkj.hzyp.utils.FileUtil;
 import com.wzkj.hzyp.utils.StringUtils;
+import com.wzkj.hzyp.vo.ResumeRecordVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -91,20 +92,20 @@ public class ResumeInfoServiceImpl implements ResumeInfoService {
     }
 
     @Override
-    public List<Map<String, Object>> pushResumeList(String aUserId,String jobId,Integer status,String name,String phone) {
-        List<Map<String, Object>> list = resumeInfoMapper.pushResumeList(aUserId, jobId,status, name, phone);
+    public List<Map<String, Object>> pushResumeList(String aUserId,String jobId,Integer status,String keyWord) {
+        List<Map<String, Object>> list = resumeInfoMapper.pushResumeList(aUserId, jobId,status,keyWord);
         return list;
     }
 
     @Override
-    public List<ResumeInfo> resumeList(String userId, Integer status, String name, String phone) {
-        List<ResumeInfo> list = resumeInfoMapper.resumeList(userId, status, name, phone);
+    public List<ResumeInfo> resumeList(String userId, Integer status,String keyWord) {
+        List<ResumeInfo> list = resumeInfoMapper.resumeList(userId, status, keyWord);
         return list;
     }
 
     @Override
-    public List<Map<String, Object>> resumeRecord( String resumeId) {
-        List<Map<String, Object>> list = resumeInfoMapper.resumeRecord(resumeId);
+    public     List<ResumeRecordVO> resumeRecord(String resumeId) {
+        List<ResumeRecordVO> list = resumeInfoMapper.resumeRecord(resumeId);
         return list;
     }
 

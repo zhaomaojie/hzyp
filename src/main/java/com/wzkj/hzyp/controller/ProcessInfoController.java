@@ -67,89 +67,6 @@ public class ProcessInfoController extends BaseController {
 
 
     /* *
-     * 测试获取accessToken
-     * @author zhaoMaoJie
-     * @date 2019/8/7 0007
-     */
-    @RequestMapping(value = "/test",method = RequestMethod.POST)
-    @ResponseBody
-    public AjaxResponse getAccessToken(){
-        String accessToken = wxTemplateService.getAccessToken();
-        return new AjaxResponse(ResponseCode.APP_SUCCESS,"获取成功",accessToken);
-    }
-
-    @RequestMapping(value = "/push",method = RequestMethod.POST)
-    @ResponseBody
-    public String push(String formId) {
-        //1,配置小程序信息
-        WxMaInMemoryConfig wxConfig = wxTemplateService.getWxConfig();
-        WxMaService wxMaService = new WxMaServiceImpl();
-        wxMaService.setWxMaConfig(wxConfig);
-        //2,设置模版信息（keyword1：类型，keyword2：内容）
-        List<WxMaTemplateData> templateDataList = new ArrayList<>(2);
-        WxMaTemplateData data1 = new WxMaTemplateData("keyword1", "张三");
-        WxMaTemplateData data2 = new WxMaTemplateData("keyword2", "男");
-        WxMaTemplateData data3 = new WxMaTemplateData("keyword3", "15");
-        WxMaTemplateData data4 = new WxMaTemplateData("keyword4", "招聘专员");
-        WxMaTemplateData data5 = new WxMaTemplateData("keyword5", DateUtil.dateToString(new Date()));
-        templateDataList.add(data1);
-        templateDataList.add(data2);
-        templateDataList.add(data3);
-        templateDataList.add(data4);
-        templateDataList.add(data5);
-
-        //3，设置推送消息
-//        BuserInfo buserInfo = buserService.getBuserById(bUserId);
-//        String openId = buserInfo.getOpenId();
-        String openId = "o2xfN4vXOvQQZrFItU4vBdCgSr1M";
-        boolean isSuccess = wxTemplateService.pushResumeTemplate(openId,formId,templateDataList,wxMaService);
-        if(isSuccess){
-            return "成功0";
-        }else {
-            return "s失败";
-        }
-    }
-
-    /* *
-     * 测试获取accessToken
-     * @author zhaoMaoJie
-     * @date 2019/8/7 0007
-     */
-    @RequestMapping(value = "/testPush",method = RequestMethod.POST)
-    @ResponseBody
-    public AjaxResponse testPush(String formId){
-        String accessToken = wxTemplateService.getAccessToken();
-        String url = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send" +
-                "?access_token=" + accessToken;
-        String openId = "o2xfN4vXOvQQZrFItU4vBdCgSr1M";
-//        String templateId = "TS3G8FWhMVvtvX1wxg25yPnNHxsR6wN8WIRHioIykFM";
-        String templateId = "GBBN6tT_SlLqaBNWjNhrCBUOF1Lz-6fpGOR7g1U8RhM";
-        WxMssVo wxMssVo = new WxMssVo();
-        wxMssVo.setTouser(openId);
-        wxMssVo.setPage("pages/index/index");
-//        wxMssVo.setEmphasisKeyword();
-        wxMssVo.setFormIdd(formId);
-        wxMssVo.setTemplateId(templateId);
-
-        Map<String, TemplateData> m = new HashMap<>(2);
-        TemplateData keyword1 = new TemplateData();
-        keyword1.setValue("新下单待抢单");
-        m.put("keyword1", keyword1);
-
-        TemplateData keyword2 = new TemplateData();
-        keyword2.setValue("这里填下单金额的值");
-        m.put("keyword2", keyword2);
-        wxMssVo.setData(m);
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> responseEntity =
-                restTemplate.postForEntity(url, wxMssVo, String.class);
-        return new AjaxResponse(ResponseCode.APP_SUCCESS,"获取成功",responseEntity);
-    }
-
-
-
-    /* *
      * 根据recevied获取简历推送流程表
      * @author zhaoMaoJie
      * @date 2019/8/7 0007
@@ -245,6 +162,8 @@ public class ProcessInfoController extends BaseController {
             newProcessInfo.setIsQuit(0);
             newProcessInfo.setIsEnd(0);
             newProcessInfo.setSortNumber(processInfo.getSortNumber() + 1);
+            processInfo.setButtonA("申诉");
+            processInfo.setButtonB("已入职|未入职|修改入职时间");
             //保存流程信息
             processInfoService.saveProcessInfo(newProcessInfo);
             processInfo.setFeedbackId(newProcessInfo.getId());
@@ -313,6 +232,8 @@ public class ProcessInfoController extends BaseController {
             newProcessInfo.setInterviewTime(interviewTime);
             newProcessInfo.setProcessContent("修改面试时间为" + DateUtil.dateToString(interviewTime,DateUtil.ymdFormat));
             newProcessInfo.setSortNumber(processInfo.getSortNumber() + 1);
+            newProcessInfo.setButtonA("申诉");
+            newProcessInfo.setButtonB("面试通过|未到场|未通过");
             //保存流程表
             processInfoService.saveProcessInfo(newProcessInfo);
             processInfo.setFeedbackId(newProcessInfo.getId());
@@ -371,6 +292,8 @@ public class ProcessInfoController extends BaseController {
             newProcessInfo.setIsQuit(0);
             newProcessInfo.setIsEnd(0);
             newProcessInfo.setSortNumber(processInfo.getSortNumber() + 1);
+            newProcessInfo.setButtonA("申诉");
+            newProcessInfo.setButtonB("已离职");
             //保存流程表
             processInfoService.saveProcessInfo(newProcessInfo);
             processInfo.setFeedbackId(newProcessInfo.getId());
@@ -446,6 +369,8 @@ public class ProcessInfoController extends BaseController {
             newProcessInfo.setIsQuit(0);
             newProcessInfo.setIsEnd(0);
             newProcessInfo.setSortNumber(processInfo.getSortNumber() + 1);
+            newProcessInfo.setButtonA("申诉");
+            newProcessInfo.setButtonB("成功入职|未入职");
             processInfoService.saveProcessInfo(newProcessInfo);
             processInfo.setFeedbackId(newProcessInfo.getId());
             processInfoService.saveProcessInfo(processInfo);

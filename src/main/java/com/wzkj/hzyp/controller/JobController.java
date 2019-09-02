@@ -4,9 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.wzkj.hzyp.common.AjaxResponse;
 import com.wzkj.hzyp.common.ResponseCode;
 import com.wzkj.hzyp.entity.*;
+import com.wzkj.hzyp.service.CommonService;
 import com.wzkj.hzyp.service.JobInfoService;
 import com.wzkj.hzyp.service.StoreInfoService;
 import com.wzkj.hzyp.utils.StringUtils;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +46,9 @@ public class JobController extends BaseController {
     @Autowired
     private JobInfoService jobInfoService;
 
+    @Autowired
+    private CommonService commonService;
+
     @RequestMapping(value = "/jobList",method = RequestMethod.POST)
     @ResponseBody
     @ApiImplicitParams({@ApiImplicitParam(name = "pageNum",value = "分页数量",paramType = "query",required = true,dataType = "Integer"),
@@ -53,8 +59,9 @@ public class JobController extends BaseController {
     public AjaxResponse getJobList(Integer pageNum,Integer pageSize,String keyWord,Integer label){
         PageHelper.startPage(pageNum,pageSize);
         List<JobInfoVO> list = jobInfoService.getJobList(keyWord, label);
-//        System.out.println(list.get(0).get("createTime"));
-        return new AjaxResponse(ResponseCode.APP_SUCCESS,list);
+        PageInfo page = new PageInfo(list);
+        Map map = commonService.getMapByList(page,list);
+        return new AjaxResponse(ResponseCode.APP_SUCCESS,map);
     }
 
     @RequestMapping(value = "/jobDetail",method = RequestMethod.POST)
@@ -126,7 +133,9 @@ public class JobController extends BaseController {
         String userId = auserInfo.getId();
         PageHelper.startPage(pageNum,pageSize);
         List<JobInfoVO> list = jobInfoService.collectionJobList(userId,collectionJobStatus);
-        return new AjaxResponse(ResponseCode.APP_SUCCESS,list);
+        PageInfo page = new PageInfo(list);
+        Map map = commonService.getMapByList(page,list);
+        return new AjaxResponse(ResponseCode.APP_SUCCESS,map);
     }
 
     /* *
@@ -145,7 +154,9 @@ public class JobController extends BaseController {
         String userId = getBuser().getId();
         PageHelper.startPage(pageNum,pageSize);
         List<JobInfoVO> list = jobInfoService.publishJobList(userId,jobName,status);
-        return new AjaxResponse(ResponseCode.APP_SUCCESS,list);
+        PageInfo page = new PageInfo(list);
+        Map map = commonService.getMapByList(page,list);
+        return new AjaxResponse(ResponseCode.APP_SUCCESS,map);
     }
 
     /* *

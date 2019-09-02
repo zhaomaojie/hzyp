@@ -82,12 +82,13 @@ project:
   name: 赏易聘
   config:
     isdebug: true
+
   aliyun_sms:
-    app_id: LTAIuDKu5Jaj9C7P
-    app_secret: XAUK4143XZ6va8786WQSzU4MkWoW1F
+    app_id: LTAIzmtNRsDxODPn
+    app_secret: g9V3dQjInqeqVoHxukWCofqFEDkX9q
     region: cn-hangzhou
-    sign: 街聘
-    val_code_template: SMS_155225079
+    sign: 赏易聘
+    val_code_template: SMS_171855196
     val_code_param: code
 
   oss:
@@ -98,48 +99,7 @@ project:
     storeFolder : storeImg
     userFolder: avatar
     webUrl: https://sypupload.oss-cn-hangzhou.aliyuncs.com
-#  aliyun_sms:
-#    accessKeyId: LTAIzmtNRsDxODPn
-#    accessKeySecret: g9V3dQjInqeqVoHxukWCofqFEDkX9q
-#    product: cn-Dysmsapi
-#    domain: dysmsapi.aliyuncs.com
-#    regionId: cn-hangzhou
-#    signName: 街聘
-#    dateFormat: yyyyMMdd
-#    endpointName: cn-hangzhou
 
-    #--------阿里云短信配置参数 start--------------#
-    #阿里云 accessKeyId（安全信息管理下面）
-#    aliyun.sms.accessKeyId=*******
-#    #阿里云 accessKeySecret（安全信息管理下面）
-#    aliyun.sms.accessKeySecret=********
-#    #产品名称:云通信短信API产品,开发者无需替换
-#    aliyun.sms.product=Dysmsapi
-#    #产品域名,开发者无需替换
-#    aliyun.sms.domain=dysmsapi.aliyuncs.com
-#    aliyun.sms.regionId=cn-hangzhou
-#    #短信签名名称（国内/国际/港澳台消息-签名管理下面）
-#    aliyun.sms.signName=****
-#    #发送日期 支持30天内记录查询，格式yyyyMMdd
-#    aliyun.sms.dateFormat=yyyyMMdd
-#    #服务结点
-#    aliyun.sms.endpointName=cn-hangzhou
-    #--------阿里云短信配置参数 end--------------#
-
-#  oss:
-#    endpoint: http://oss-cn-hangzhou.aliyuncs.com
-#    access_key_id: LTAIkIkHmeTP2Xpj
-#    access_key_secret: rqjojQK6w417GKqkEznLja7DihZ84T
-#    backet_name: jiepinupload
-#    file_server: http://jiepinupload.oss-cn-hangzhou.aliyuncs.com
-
-#  aliyun_sms:
-#    app_id: LTAIuDKu5Jaj9C7P
-#    app_secret: XAUK4143XZ6va8786WQSzU4MkWoW1F
-#    region: cn-hangzhou
-#    sign: 街聘
-#    val_code_template: SMS_155225079
-#    val_code_param: code
   weixin:
     mp_app_id: wx5666e9599cc559e6
     mp_app_secret: 05b9cf4e5a843dd2c314f666e742d886

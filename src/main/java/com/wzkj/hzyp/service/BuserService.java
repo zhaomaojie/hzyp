@@ -76,4 +76,11 @@ public interface BuserService {
      */
     List<CashoutDetail> getCashoutDetail(String userId);
 
+    /* *
+     *
+     * @author zhaoMaoJie
+     * @date 2019/8/29 0029
+     */
+    BuserInfo getBuserInfoByOpenId(String oepnId);
+
 }

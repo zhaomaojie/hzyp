@@ -92,6 +92,12 @@ public class ProcessInfo {
     @Column(name = "SORT_NUMBER")
     private Integer sortNumber;
 
+    /** A端按钮 */
+    private String buttonA;
+
+    /** B端按钮 */
+    private String buttonB;
+
     public String getId() {
         return id;
     }
@@ -242,5 +248,21 @@ public class ProcessInfo {
 
     public void setSortNumber(Integer sortNumber) {
         this.sortNumber = sortNumber;
+    }
+
+    public String getButtonA() {
+        return buttonA;
+    }
+
+    public void setButtonA(String buttonA) {
+        this.buttonA = buttonA;
+    }
+
+    public String getButtonB() {
+        return buttonB;
+    }
+
+    public void setButtonB(String buttonB) {
+        this.buttonB = buttonB;
     }
 }

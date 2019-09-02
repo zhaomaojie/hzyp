@@ -6,6 +6,7 @@ import com.wzkj.hzyp.common.ResponseCode;
 import com.wzkj.hzyp.entity.AuserInfo;
 import com.wzkj.hzyp.entity.BuserInfo;
 import com.wzkj.hzyp.service.AUserService;
+import com.wzkj.hzyp.service.AliyunSMSService;
 import com.wzkj.hzyp.service.BuserService;
 import com.wzkj.hzyp.utils.*;
 import com.wzkj.hzyp.vo.AUserVO;
@@ -47,6 +48,9 @@ public class LoginController extends BaseController {
 
     @Autowired
     private BuserService buserService;
+
+    @Autowired
+    private AliyunSMSService aliyunSMSService;
 
 
     @Value("${project.weixin.mp_app_id}")
@@ -185,9 +189,9 @@ public class LoginController extends BaseController {
             if (isExist) {
                 AuserInfo auserInfo = getLoginUser();
                 String phone = auserInfo.getEmpowerPhone();
-                if(!phone.equals(phoneNumber)){
-                    return new AjaxResponse(ResponseCode.APP_FAIL,"手机号输入有误！");
-                }
+//                if(!phone.equals(phoneNumber)){
+//                    return new AjaxResponse(ResponseCode.APP_FAIL,"手机号输入有误！");
+//                }
                 AuserInfo aUserInfoEntity = aUserService.getUserInfoByPhone(phoneNumber);
                 String id = aUserInfoEntity.getId();
                 String token = RSAUtil.getToken(id);
@@ -272,7 +276,8 @@ public class LoginController extends BaseController {
                 aUserInfoEntity.setVerifyCode(code);
                 aUserInfoEntity.setVerdifyCodeTime(new Date());
                 aUserService.saveUser(aUserInfoEntity);
-                AliyunSMSUtil.sendVerdifyCode(phone, code);
+//                AliyunSMSUtil.sendVerdifyCode(phone, code);
+                boolean isSuccess = aliyunSMSService.sendVerdifyCode(phone,code);
                 //返回到前端
                 AUserVO aUserVO = new AUserVO();
                 BeanUtils.copyProperties(aUserInfoEntity, aUserVO);
@@ -282,7 +287,8 @@ public class LoginController extends BaseController {
                 return new AjaxResponse(ResponseCode.APP_SUCCESS,aUserVO);
             } else {
                 //当用户不存在时 首先执行注册 然后再生成验证码
-                AuserInfo aUserInfoEntity = getLoginUser();
+//                AuserInfo aUserInfoEntity = getLoginUser();
+                AuserInfo aUserInfoEntity = new AuserInfo();
                 aUserInfoEntity.setEmpowerPhone(phone);
                 Date now = new Date();
                 aUserInfoEntity.setCreateTime(now);
@@ -295,7 +301,11 @@ public class LoginController extends BaseController {
                 //保存用户信息
                 aUserService.saveUser(aUserInfoEntity);
                 // 发送验证码
-                AliyunSMSUtil.sendVerdifyCode(phone, code);
+//                AliyunSMSUtil.sendVerdifyCode(phone, code);
+                boolean isSuccess = aliyunSMSService.sendVerdifyCode(phone,code);
+                if(!isSuccess){
+                    return new AjaxResponse(ResponseCode.APP_FAIL,"验证码发送失败！");
+                }
                 AUserVO aUserVO = new AUserVO();
                 BeanUtils.copyProperties(aUserInfoEntity, aUserVO);
                 aUserVO.setIsLogin(-1);
@@ -382,11 +392,10 @@ public class LoginController extends BaseController {
                 Integer age = bUserInfoEntity.getAge();
                 if(StringUtils.isBlank(name) || age == null){
                     bUserVO.setIsRegister(-1);
-                    bUserVO.setIsLogin(-1);
                 }else {
                     bUserVO.setIsRegister(0);
-                    bUserVO.setIsLogin(0);
                 }
+                bUserVO.setIsLogin(0);
                 bUserVO.setType(1);
                 redis.set(USER_REDIS_SESSION + ":" + id, token);
                 return new AjaxResponse(ResponseCode.APP_SUCCESS, "登录成功", bUserVO);
@@ -418,6 +427,39 @@ public class LoginController extends BaseController {
 
 
 
+
+
+
+    /* *
+     *  B端首次登录验证
+     * @author zhaoMaoJie
+     * @date 2019/9/2 0002
+     */
+    @RequestMapping(value = "/loginForB",method = RequestMethod.POST)
+    @ResponseBody
+    public AjaxResponse loginForB(){
+        AuserInfo auserInfo = getLoginUser();
+        String openId = auserInfo.getOpenId();
+        BuserInfo buserInfo = buserService.getBuserInfoByOpenId(openId);
+        if(buserInfo == null){
+            return new AjaxResponse(ResponseCode.APP_FAIL,"请先注册！");
+        }
+        String id = buserInfo.getId();
+        String token = RSAUtil.getToken(id);
+        BuserVO buserVO = new BuserVO();
+        buserInfo.setOpenId("");
+        BeanUtils.copyProperties(buserInfo, buserVO);
+        buserVO.setToken(token);
+        buserVO.setId("");
+        return new AjaxResponse(ResponseCode.APP_SUCCESS,buserVO);
+    }
+
+
+    /* *
+     * B端发送验证码
+     * @author zhaoMaoJie
+     * @date 2019/9/2 0002
+     */
     @RequestMapping(value = "/sendVerdifyCodeForB",method = RequestMethod.POST)
     @ResponseBody
     @ApiImplicitParams({@ApiImplicitParam(name = "phone",value = "手机号",paramType = "query",required = true,dataType = "string")})
@@ -479,6 +521,11 @@ public class LoginController extends BaseController {
         }
     }
 
+    /* *
+     * B端登录
+     * @author zhaoMaoJie
+     * @date 2019/9/2 0002
+     */
     @RequestMapping(value = "/loginByCodeforB",method = RequestMethod.POST)
     @ResponseBody
     @ApiImplicitParams({@ApiImplicitParam(name = "phone",value = "手机号",paramType = "query",required = true,dataType = "string"),
@@ -504,128 +551,12 @@ public class LoginController extends BaseController {
                     Integer age = buserInfo.getAge();
                     if(StringUtils.isBlank(name) || age == null){
                         buserVO.setIsRegister(-1);
-                        buserVO.setIsLogin(-1);
                     }else {
                         buserVO.setIsRegister(0);
-                        buserVO.setIsLogin(0);
                     }
+                    buserVO.setIsLogin(0);
                     buserVO.setType(1);
                     return new AjaxResponse(ResponseCode.APP_SUCCESS, "登录成功", buserVO);
-                } else {
-                    return new AjaxResponse(ResponseCode.APP_FAIL, "验证码超时，请重新获取!");
-                }
-            } else {
-                return new AjaxResponse(ResponseCode.APP_FAIL, "验证码输入有误！");
-            }
-        } else {
-            return new AjaxResponse(ResponseCode.APP_FAIL, "手机号或验证码输入不正确！");
-        }
-    }
-
-
-
-    /* *
-     * 该方法暂时废弃 仅供参考
-     * @author zhaoMaoJie
-     * @date 2019/8/15 0015
-     */
-    @RequestMapping(value = "/wxLogin1",method = RequestMethod.POST)
-    @ResponseBody
-    @ApiImplicitParams({@ApiImplicitParam(name = "code",value = "微信获取到的数据",paramType = "query",required = true,dataType = "string"),
-            @ApiImplicitParam(name = "encryptedData",value = "微信获取到的数据",paramType = "query",required = true,dataType = "string"),
-            @ApiImplicitParam(name = "iv",value = "微信获取到的数据",paramType = "query",required = true,dataType = "string")})
-    @ApiOperation(value = "微信默认进入授权",notes = "用户打开小程序第一次进入调用的授权接口")
-    private AjaxResponse wxLogin1(HttpServletRequest request, String code, String encryptedData, String iv) throws Exception {
-        // 创建Httpclient对象
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        String resultString = "";
-        CloseableHttpResponse response = null;
-        String url = "https://api.weixin.qq.com/sns/jscode2session?appid=" + appid + "&secret=" + appsecret + "&js_code=" + code + "&grant_type=authorization_code";
-        if (StringUtils.isEmpty(code)) {
-            return new AjaxResponse(ResponseCode.APP_FAIL, "code不能为空");
-        }
-        if (StringUtils.isEmpty(encryptedData)) {
-            return new AjaxResponse(ResponseCode.APP_FAIL, "encryptedData不能为空");
-        }
-        if (StringUtils.isEmpty(iv)) {
-            return new AjaxResponse(ResponseCode.APP_FAIL, "iv不能为空");
-        }
-        try {
-            // 创建uri
-            URIBuilder builder = new URIBuilder(url);
-            URI uri = builder.build();
-
-            // 创建http GET请求
-            HttpGet httpGet = new HttpGet(uri);
-
-            // 执行请求
-            response = httpclient.execute(httpGet);
-            // 判断返回状态是否为200
-            if (response.getStatusLine().getStatusCode() == 200) {
-                resultString = EntityUtils.toString(response.getEntity(), "UTF-8");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        //获取解密结果 openid session_key
-        JSONObject jsonObject = (JSONObject) JSONObject.parse(resultString);
-        String session_key = jsonObject.get("session_key").toString();
-        String result = AesUtil.decrypt(encryptedData, session_key, iv, "UTF-8");
-        // 解析含有电话信息的json
-        JSONObject json = (JSONObject) JSONObject.parse(result);
-        String phone = json.getString("phoneNumber");
-
-        //如果手机号为空
-        if (StringUtils.isEmpty(phone)) {
-            return new AjaxResponse(ResponseCode.APP_FAIL, "用户未绑定手机号");
-        } else {
-            //校验 该用户是否注册
-            boolean isExist = aUserService.queryUserIsExist(phone);
-            //用户是注册用户
-            if (isExist) {
-                AuserInfo aUserInfoEntity = aUserService.getUserInfoByPhone(phone);
-                String id = aUserInfoEntity.getId();
-                String token = RSAUtil.getToken(id);
-                AUserVO aUserVO = new AUserVO();
-                BeanUtils.copyProperties(aUserInfoEntity, aUserVO);
-                aUserVO.setToken(token);
-                redis.set(USER_REDIS_SESSION + ":" + id, token);
-                return new AjaxResponse(ResponseCode.APP_SUCCESS,  aUserVO);
-            } else {
-                return new AjaxResponse(ResponseCode.APP_SUCCESS);
-            }
-        }
-    }
-
-
-
-    /* *
-     * 该方法废弃 已经重写
-     * @author zhaoMaoJie
-     * @date 2019/8/15 0015
-     */
-    @RequestMapping(value = "/loginByCode1",method = RequestMethod.POST)
-    @ResponseBody
-    @ApiImplicitParams({@ApiImplicitParam(name = "phone",value = "手机号",paramType = "query",required = true,dataType = "string"),
-            @ApiImplicitParam(name = "code",value = "验证码",paramType = "query",required = true,dataType = "string")})
-    @ApiOperation(value = "用户使用手机验证码登录",notes = "验证码有效期为五分钟")
-    public AjaxResponse loginByCode1(String phone, String code) {
-        if (!StringUtils.isEmpty(phone) && !StringUtils.isEmpty(code)) {
-            AuserInfo aUserInfoEntity = aUserService.getUserInfoByPhone(phone);
-            String verifyCode = aUserInfoEntity.getVerifyCode();
-            Date verdifyDate = aUserInfoEntity.getVerdifyCodeTime();
-            int difference = DateUtil.getTimeDifferent(verdifyDate, new Date());
-            System.out.println(difference);
-            if (code.equals(verifyCode)) {
-                if (difference < 5 * 60) {
-                    String id = aUserInfoEntity.getId();
-                    String token = RSAUtil.getToken(id);
-                    redis.set(USER_REDIS_SESSION + ":" + id, token);
-                    AUserVO aUserVO = new AUserVO();
-                    BeanUtils.copyProperties(aUserInfoEntity, aUserVO);
-                    aUserVO.setToken(token);
-                    return new AjaxResponse(ResponseCode.APP_SUCCESS, "登录成功", aUserVO);
                 } else {
                     return new AjaxResponse(ResponseCode.APP_FAIL, "验证码超时，请重新获取!");
                 }

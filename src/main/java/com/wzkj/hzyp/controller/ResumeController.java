@@ -5,12 +5,14 @@ import cn.binarywang.wx.miniapp.api.impl.WxMaServiceImpl;
 import cn.binarywang.wx.miniapp.bean.WxMaTemplateData;
 import cn.binarywang.wx.miniapp.config.WxMaInMemoryConfig;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.wzkj.hzyp.common.AjaxResponse;
 import com.wzkj.hzyp.common.ResponseCode;
 import com.wzkj.hzyp.entity.*;
 import com.wzkj.hzyp.service.*;
 import com.wzkj.hzyp.utils.DateUtil;
 import com.wzkj.hzyp.utils.StringUtils;
+import com.wzkj.hzyp.vo.ResumeRecordVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -49,6 +51,9 @@ public class ResumeController extends BaseController {
 
     @Autowired
     private WxTemplateService wxTemplateService;
+
+    @Autowired
+    private CommonService commonService;
 
     /* *
      * 保存/修改简历
@@ -216,6 +221,8 @@ public class ResumeController extends BaseController {
             processInfo.setOwner(0);
 //            Integer sortNumber =  processInfoService.getNewSortNumber(receviedId);
             processInfo.setSortNumber(1);
+            processInfo.setButtonA("取消简历");
+            processInfo.setButtonB("面试通过|未到场|面试不通过|修改面试时间");
             processInfoService.saveProcessInfo(processInfo);
             //推送成功后改变原始岗位的简历数 收藏岗位的状态 B端接收简历表加入数据 流程表加入内容
             //改变岗位收到的简历数
@@ -284,14 +291,16 @@ public class ResumeController extends BaseController {
             @ApiImplicitParam(name = "phone",value = "电话，用于搜索",paramType = "query",required = true,dataType = "String")
              })
     @ApiOperation(value = "查看对应岗位推送的简历",notes = "我的项目中管理使用")
-    public AjaxResponse pushResumeList(Integer pageNum,Integer pageSize,Integer status,String jobId,String name,String phone){
+    public AjaxResponse pushResumeList(Integer pageNum,Integer pageSize,Integer status,String jobId,String name,String phone,String keyWord){
         if(StringUtils.isBlank(jobId)){
             return new AjaxResponse(ResponseCode.APP_FAIL,"id不能为空！");
         }else {
             String userId = getLoginUser().getId();
             PageHelper.startPage(pageNum,pageSize);
-            List<Map<String,Object>> list = resumeInfoService.pushResumeList(userId,jobId,status,name,phone);
-            return new AjaxResponse(ResponseCode.APP_SUCCESS,list);
+            List<Map<String,Object>> list = resumeInfoService.pushResumeList(userId,jobId,status,keyWord);
+            PageInfo page = new PageInfo(list);
+            Map map = commonService.getMapByList(page,list);
+            return new AjaxResponse(ResponseCode.APP_SUCCESS,map);
         }
     }
 
@@ -309,12 +318,14 @@ public class ResumeController extends BaseController {
             @ApiImplicitParam(name = "phone",value = "电话，用于搜索",paramType = "query",required = true,dataType = "String")
     })
     @ApiOperation(value = "查看自己创建的简历",notes = "简历管理中使用")
-    public AjaxResponse resumeList(Integer pageNum,Integer pageSize,Integer status,String name,String phone){
+    public AjaxResponse resumeList(Integer pageNum,Integer pageSize,Integer status,String keyWord){
         AuserInfo auserInfo = getLoginUser();
         String userId = auserInfo.getId();
         PageHelper.startPage(pageNum,pageSize);
-        List<ResumeInfo> list = resumeInfoService.resumeList(userId,status,name,phone);
-        return new AjaxResponse(ResponseCode.APP_SUCCESS,list);
+        List<ResumeInfo> list = resumeInfoService.resumeList(userId,status,keyWord);
+        PageInfo page = new PageInfo(list);
+        Map map = commonService.getMapByList(page,list);
+        return new AjaxResponse(ResponseCode.APP_SUCCESS,map);
     }
 
     /* *
@@ -351,7 +362,7 @@ public class ResumeController extends BaseController {
             return new AjaxResponse(ResponseCode.APP_FAIL,"id不能为空!");
         }else {
             PageHelper.startPage(pageNum,pageSize);
-            List<Map<String,Object>> list = resumeInfoService.resumeRecord(id);
+            List<ResumeRecordVO> list = resumeInfoService.resumeRecord(id);
             return new AjaxResponse(ResponseCode.APP_SUCCESS,list);
         }
     }
@@ -374,7 +385,9 @@ public class ResumeController extends BaseController {
         String bUserId = getBuser().getId();
         PageHelper.startPage(pageNum,pageSize);
         List<Map<String,Object>> list = resumeInfoService.myCandidate(bUserId,status,name,phone);
-        return new AjaxResponse(ResponseCode.APP_SUCCESS,list);
+        PageInfo page = new PageInfo(list);
+        Map map = commonService.getMapByList(page,list);
+        return new AjaxResponse(ResponseCode.APP_SUCCESS,map);
     }
 
 

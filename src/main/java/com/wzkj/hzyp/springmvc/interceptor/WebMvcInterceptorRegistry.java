@@ -23,7 +23,7 @@ public class WebMvcInterceptorRegistry implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(interceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/login/wxLogin")
+                .excludePathPatterns("/login/*")
                 .excludePathPatterns("/job/jobList")
                 .excludePathPatterns("/resume/bindingAvatar")
                 //放行swagger相关文件

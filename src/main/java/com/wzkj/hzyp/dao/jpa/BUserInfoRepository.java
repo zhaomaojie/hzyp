@@ -18,4 +18,11 @@ public interface BUserInfoRepository extends JpaRepository<BuserInfo,String> {
      * @date 2019/8/8 0008
      */
     BuserInfo findByEmpowerPhone(String empowerPhone);
+
+    /* *
+     * 通过openId查询是否存在B端用户
+     * @author zhaoMaoJie
+     * @date 2019/8/29 0029
+     */
+    BuserInfo findByOpenId(String openId);
 }
