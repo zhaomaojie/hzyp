@@ -105,31 +105,34 @@ public class LoginController extends BaseController {
             AuserInfo newAuserInfo = new AuserInfo();
             newAuserInfo.setCreateTime(new Date());
             newAuserInfo.setOpenId(openId);
+            newAuserInfo.setLastLoginTime(new Date());
             aUserService.saveUser(newAuserInfo);
             String newId = newAuserInfo.getId();
             String token = RSAUtil.getToken(newId);
             AUserVO aUserVO = new AUserVO();
             BeanUtils.copyProperties(newAuserInfo, aUserVO);
             aUserVO.setToken(token);
-            aUserVO.setIsLogin(-1);
+            aUserVO.setIsLogin(0);
             aUserVO.setIsRegister(-1);
             redis.set(USER_REDIS_SESSION + ":" + openId,session_key);
             return new AjaxResponse(ResponseCode.APP_SUCCESS,aUserVO);
         }else {
             //已注册的情况下 根据openid获取到用户数据后 更新session_key 返回到前端
+            auserInfo.setLastLoginTime(new Date());
             String id = auserInfo.getId();
             String token = RSAUtil.getToken(id);
             AUserVO aUserVO = new AUserVO();
             BeanUtils.copyProperties(auserInfo, aUserVO);
             aUserVO.setToken(token);
             String phone = auserInfo.getEmpowerPhone();
-            if(phone == null || phone.equals("")){
-                aUserVO.setIsLogin(-1);
+            String name = auserInfo.getName();
+            Integer age = auserInfo.getAge();
+            if(phone == null || phone.equals("") || StringUtils.isBlank(name) || age == null){
                 aUserVO.setIsRegister(-1);
             }else {
-                aUserVO.setIsLogin(0);
                 aUserVO.setIsRegister(0);
             }
+            aUserVO.setIsLogin(0);
             redis.set(USER_REDIS_SESSION + ":" + auserInfo.getOpenId(),session_key);
             return new AjaxResponse(ResponseCode.APP_SUCCESS,aUserVO);
         }
@@ -187,12 +190,8 @@ public class LoginController extends BaseController {
             boolean isExist = aUserService.queryUserIsExist(phoneNumber);
             //不为空 表示该用户已经注册过,已存在该用户
             if (isExist) {
-                AuserInfo auserInfo = getLoginUser();
-                String phone = auserInfo.getEmpowerPhone();
-//                if(!phone.equals(phoneNumber)){
-//                    return new AjaxResponse(ResponseCode.APP_FAIL,"手机号输入有误！");
-//                }
                 AuserInfo aUserInfoEntity = aUserService.getUserInfoByPhone(phoneNumber);
+                aUserInfoEntity.setLastLoginTime(new Date());
                 String id = aUserInfoEntity.getId();
                 String token = RSAUtil.getToken(id);
                 AUserVO aUserVO = new AUserVO();
@@ -242,6 +241,7 @@ public class LoginController extends BaseController {
         AuserInfo aUserInfo = getLoginUser();
         aUserInfo.setAge(age);
         aUserInfo.setName(name);
+        aUserInfo.setLastLoginTime(new Date());
         aUserService.updateUserInfo(aUserInfo);
         String id = aUserInfo.getId();
         String token = RSAUtil.getToken(id);
@@ -276,13 +276,18 @@ public class LoginController extends BaseController {
                 aUserInfoEntity.setVerifyCode(code);
                 aUserInfoEntity.setVerdifyCodeTime(new Date());
                 aUserService.saveUser(aUserInfoEntity);
-//                AliyunSMSUtil.sendVerdifyCode(phone, code);
                 boolean isSuccess = aliyunSMSService.sendVerdifyCode(phone,code);
                 //返回到前端
                 AUserVO aUserVO = new AUserVO();
                 BeanUtils.copyProperties(aUserInfoEntity, aUserVO);
                 aUserVO.setIsLogin(0);
-                aUserVO.setIsRegister(0);
+                String name = aUserInfoEntity.getName();
+                Integer age = aUserInfoEntity.getAge();
+                if(StringUtils.isBlank(name) || age == null){
+                    aUserVO.setIsRegister(-1);
+                }else {
+                    aUserVO.setIsRegister(0);
+                }
                 aUserVO.setVerifyCode("");
                 return new AjaxResponse(ResponseCode.APP_SUCCESS,aUserVO);
             } else {
@@ -341,6 +346,10 @@ public class LoginController extends BaseController {
             if(difference >= 5 * 60){
                 return new AjaxResponse(ResponseCode.APP_FAIL, "验证码超时，请重新获取!");
             }else {
+                //更新用户最近登陆时间
+                aUserInfoEntity.setLastLoginTime(new Date());
+                aUserService.saveUser(aUserInfoEntity);
+                //设置用户返回数据
                 String id = aUserInfoEntity.getId();
                 String token = RSAUtil.getToken(id);
                 redis.set(USER_REDIS_SESSION + ":" + id, token);
@@ -352,81 +361,15 @@ public class LoginController extends BaseController {
                 Integer age = aUserInfoEntity.getAge();
                 if(StringUtils.isBlank(name) || age == null){
                     aUserVO.setIsRegister(-1);
-                    aUserVO.setIsLogin(-1);
                 }else {
                     aUserVO.setIsRegister(0);
-                    aUserVO.setIsLogin(0);
                 }
+                aUserVO.setIsLogin(0);
                 aUserVO.setType(0);
                 return new AjaxResponse(ResponseCode.APP_SUCCESS, "登录成功", aUserVO);
             }
         }
     }
-
-
-
-    /* *
-     * @author zhaoMaoJie
-     * @date 2019/8/15 0015
-     */
-    @RequestMapping(value = "/fastLoginForB",method = RequestMethod.POST)
-    @ResponseBody
-    @ApiImplicitParams({@ApiImplicitParam(name = "phoneNumeber",value = "手机号",paramType = "query",required = true,dataType = "string")})
-    @ApiOperation(value = "B端使用手机号登录",notes = "该方法暂时废弃，使用手机号均需要验证码")
-    public AjaxResponse fastLoginForB(String phoneNumeber) {
-        if (StringUtils.isEmpty(phoneNumeber) || phoneNumeber.equals("undefined")) {
-            return new AjaxResponse(ResponseCode.APP_FAIL, "手机号输入有误");
-        } else {
-            //手机号不为空 判断是否是已注册用户
-            boolean isExist = buserService.queryUserIsExist(phoneNumeber);
-            //不为空 表示该用户已经注册过,已存在该用户
-            if (isExist) {
-                BuserInfo bUserInfoEntity = buserService.getUserInfoByPhone(phoneNumeber);
-                String id = bUserInfoEntity.getId();
-                String token = RSAUtil.getToken(id);
-                BuserVO bUserVO = new BuserVO();
-                BeanUtils.copyProperties(bUserInfoEntity, bUserVO);
-                bUserVO.setToken(token);
-                //是否需要注册
-                String name = bUserInfoEntity.getName();
-                Integer age = bUserInfoEntity.getAge();
-                if(StringUtils.isBlank(name) || age == null){
-                    bUserVO.setIsRegister(-1);
-                }else {
-                    bUserVO.setIsRegister(0);
-                }
-                bUserVO.setIsLogin(0);
-                bUserVO.setType(1);
-                redis.set(USER_REDIS_SESSION + ":" + id, token);
-                return new AjaxResponse(ResponseCode.APP_SUCCESS, "登录成功", bUserVO);
-            } else {
-                //用户注册
-                AuserInfo auserInfo = getLoginUser();
-                String openId = auserInfo.getOpenId();
-                BuserInfo buserInfo = new BuserInfo();
-                buserInfo.setOpenId(openId);
-                Date now = new Date();
-                buserInfo.setCreateTime(now);
-                buserInfo.setUpdateTime(now);
-                buserInfo.setDelFlag(0);
-                buserInfo.setEmpowerPhone(phoneNumeber);
-                buserService.saveUser(buserInfo);
-                String id = buserInfo.getId();
-                String token = RSAUtil.getToken(id);
-                redis.set(USER_REDIS_SESSION + ":" + id, token);
-                BuserVO bUserVO = new BuserVO();
-                BeanUtils.copyProperties(buserInfo, bUserVO);
-                bUserVO.setToken(token);
-                bUserVO.setIsLogin(-1);
-                bUserVO.setIsRegister(-1);
-                bUserVO.setType(1);
-                return new AjaxResponse(ResponseCode.APP_SUCCESS, "登录成功", bUserVO);
-            }
-        }
-    }
-
-
-
 
 
 
@@ -441,9 +384,12 @@ public class LoginController extends BaseController {
         AuserInfo auserInfo = getLoginUser();
         String openId = auserInfo.getOpenId();
         BuserInfo buserInfo = buserService.getBuserInfoByOpenId(openId);
+        //用户未注册的情况下下 直接返回 先执行企业注册
         if(buserInfo == null){
             return new AjaxResponse(ResponseCode.APP_FAIL,"请先注册！");
         }
+        buserInfo.setLastLoginTime(new Date());
+        buserService.saveUser(buserInfo);
         String id = buserInfo.getId();
         String token = RSAUtil.getToken(id);
         BuserVO buserVO = new BuserVO();
@@ -451,6 +397,13 @@ public class LoginController extends BaseController {
         BeanUtils.copyProperties(buserInfo, buserVO);
         buserVO.setToken(token);
         buserVO.setId("");
+        buserVO.setIsLogin(0);
+//        boolean isRegister = buserService.isReister(buserInfo.getId());
+//        if(isRegister){
+//            buserVO.setIsRegister(0);
+//        }else {
+//            buserVO.setIsRegister(-1);
+//        }
         return new AjaxResponse(ResponseCode.APP_SUCCESS,buserVO);
     }
 
@@ -476,7 +429,10 @@ public class LoginController extends BaseController {
                 buserInfo.setVerifyCode(code);
                 buserInfo.setVerdifyCodeTime(new Date());
                 buserService.saveUser(buserInfo);
-                AliyunSMSUtil.sendVerdifyCode(phone, code);
+                boolean isSuccess = aliyunSMSService.sendVerdifyCode(phone,code);
+                if(!isSuccess){
+                    return new AjaxResponse(ResponseCode.APP_FAIL,"验证码发送失败！");
+                }
                 BuserVO buserVO = new BuserVO();
                 BeanUtils.copyProperties(buserInfo, buserVO);
                 //是否需要注册
@@ -510,7 +466,10 @@ public class LoginController extends BaseController {
                 //保存用户信息
                 buserService.saveUser(buserInfo);
                 // 发送验证码
-                AliyunSMSUtil.sendVerdifyCode(phone, code);
+                boolean isSuccess = aliyunSMSService.sendVerdifyCode(phone,code);
+                if(!isSuccess){
+                    return new AjaxResponse(ResponseCode.APP_FAIL,"验证码发送失败！");
+                }
                 BuserVO buserVO = new BuserVO();
                 BeanUtils.copyProperties(buserInfo, buserVO);
                 buserVO.setIsLogin(-1);
@@ -543,6 +502,8 @@ public class LoginController extends BaseController {
                     String id = buserInfo.getId();
                     String token = RSAUtil.getToken(id);
                     redis.set(USER_REDIS_SESSION + ":" + id, token);
+                    buserInfo.setLastLoginTime(new Date());
+                    buserService.saveUser(buserInfo);
                     BuserVO buserVO = new BuserVO();
                     BeanUtils.copyProperties(buserInfo, buserVO);
                     buserVO.setToken(token);

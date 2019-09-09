@@ -83,4 +83,11 @@ public interface BuserService {
      */
     BuserInfo getBuserInfoByOpenId(String oepnId);
 
+    /* *
+     * 通过id查询是否有B端对应商户信息
+     * @author zhaoMaoJie
+     * @date 2019/9/3 0003
+     */
+    boolean isReister(String id);
+
 }

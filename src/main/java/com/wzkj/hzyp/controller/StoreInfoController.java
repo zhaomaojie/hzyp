@@ -22,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @user zhaoMaoJie
@@ -62,6 +64,7 @@ public class StoreInfoController extends BaseController {
             storeInfo.setAddress(address);
             storeInfo.setIndustryCode(industryCode);
             storeInfo.setContactName(contactName);
+            storeInfo.setPhone(phone);
             //保存 用户图片
             storeInfo.setBusinessImg(businessImg);
             storeInfo.setCompanyImg(companyImg);
@@ -72,7 +75,9 @@ public class StoreInfoController extends BaseController {
             String userId = getBuser().getId();
             storeInfo.setbUserId(userId);
             storeInfoService.saveStoreInfo(storeInfo);
-            return new AjaxResponse(ResponseCode.APP_SUCCESS);
+            Map map = new HashMap();
+            map.put("id",storeInfo.getId());
+            return new AjaxResponse(ResponseCode.APP_SUCCESS,map);
         }else {
             StoreInfo storeInfo = storeInfoService.getStoreInfoById(id);
             storeInfo.setName(name);
@@ -90,9 +95,76 @@ public class StoreInfoController extends BaseController {
             String userId = getBuser().getId();
             storeInfo.setbUserId(userId);
             storeInfoService.saveStoreInfo(storeInfo);
-            return new AjaxResponse(ResponseCode.APP_SUCCESS);
+            Map map = new HashMap();
+            map.put("id",storeInfo.getId());
+            return new AjaxResponse(ResponseCode.APP_SUCCESS,map);
         }
     }
+
+    /* *
+     * 图片上传 并获取图片的url地址
+     * @author zhaoMaoJie
+     * @date 2019/9/5 0005
+     */
+    @RequestMapping(value = "/getImageWebUrl",method = RequestMethod.POST)
+    @ResponseBody
+    public AjaxResponse getImageWebUrl(MultipartFile file){
+        if(file.isEmpty()){
+            return new AjaxResponse(ResponseCode.APP_FAIL,"未能获取到图片参数！");
+        }
+        String url = storeInfoService.getUploadImageUrl(file);
+        Map map = new HashMap();
+        if(StringUtils.isNotBlank(url)){
+            map.put("url",url);
+            return new AjaxResponse(ResponseCode.APP_SUCCESS,map);
+        }else {
+            return new AjaxResponse(ResponseCode.APP_FAIL,"上传失败！");
+        }
+    }
+
+
+    @RequestMapping(value = "/bindStoreBusinessImg",method = RequestMethod.POST)
+    @ResponseBody
+    public AjaxResponse bindStoreBusinessImg(String id,MultipartFile file){
+        if(StringUtils.isBlank(id) || file.isEmpty()){
+            return new AjaxResponse(ResponseCode.APP_FAIL,"参数有误！");
+        }
+        boolean isBind = storeInfoService.bindStoreBusinessImg(id,file);
+        if(isBind){
+            return new AjaxResponse(ResponseCode.APP_SUCCESS,"上传成功！");
+        }else {
+            return new AjaxResponse(ResponseCode.APP_FAIL,"上传失败！");
+        }
+    }
+
+    @RequestMapping(value = "/bindStoreCompanyImg",method = RequestMethod.POST)
+    @ResponseBody
+    public AjaxResponse bindStoreCompanyImg(String id,MultipartFile file){
+        if(StringUtils.isBlank(id) || file.isEmpty()){
+            return new AjaxResponse(ResponseCode.APP_FAIL,"参数有误！");
+        }
+        boolean isBind = storeInfoService.bindStoreCompanyImg(id,file);
+        if(isBind){
+            return new AjaxResponse(ResponseCode.APP_SUCCESS,"上传成功！");
+        }else {
+            return new AjaxResponse(ResponseCode.APP_FAIL,"上传失败！");
+        }
+    }
+
+    @RequestMapping(value = "/bindStoreLogo",method = RequestMethod.POST)
+    @ResponseBody
+    public AjaxResponse bindStoreLogo(String id,MultipartFile file){
+        if(StringUtils.isBlank(id) || file.isEmpty()){
+            return new AjaxResponse(ResponseCode.APP_FAIL,"参数有误！");
+        }
+        boolean isBind = storeInfoService.bindStoreLogo(id,file);
+        if(isBind){
+            return new AjaxResponse(ResponseCode.APP_SUCCESS,"上传成功！");
+        }else {
+            return new AjaxResponse(ResponseCode.APP_FAIL,"上传失败！");
+        }
+    }
+
 
     /* *
      * 上传图片到oss 并返回web访问地址
@@ -107,7 +179,6 @@ public class StoreInfoController extends BaseController {
         if(file.isEmpty()){
             return new AjaxResponse(ResponseCode.APP_FAIL,"请先选择图片！");
         }
-//        logger.info("文件上传");
         String filename = file.getOriginalFilename();
         System.out.println(filename);
 

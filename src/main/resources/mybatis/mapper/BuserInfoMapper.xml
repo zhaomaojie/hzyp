@@ -27,7 +27,7 @@
     WHERE
 	1 = 1
 	<if test="bUserId != null and bUserId != ''">
-      AND a.b_user_id = #{aUserId}
+      AND a.b_user_id = #{bUserId}
     </if>
     AND a.del_flag = 0
   </select>
@@ -40,7 +40,7 @@
 	WHERE
      a.del_flag = 0
     <if test="bUserId != null and bUserId != ''">
-      AND a.b_user_id = #{aUserId}
+      AND a.b_user_id = #{bUserId}
     </if>
   </select>
 
@@ -52,7 +52,7 @@
     WHERE
 	a.del_flag = 0
     <if test="bUserId != null and bUserId != ''">
-      AND a.b_user_id = #{aUserId}
+      AND a.b_user_id = #{bUserId}
     </if>
   </select>
 
@@ -62,7 +62,8 @@
     FROM
 	a_cashout_detail a
     <if test="bUserId != null and bUserId != ''">
-      AND a.b_user_id = #{aUserId}</if>
+      WHERE a.b_user_id = #{bUserId}
+    </if>
     </select>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 

@@ -1,10 +1,12 @@
 package com.wzkj.hzyp.service.impl;
 
 import com.wzkj.hzyp.dao.jpa.BUserInfoRepository;
+import com.wzkj.hzyp.dao.jpa.StoreInfoRepository;
 import com.wzkj.hzyp.dao.mybatis.BuserInfoMapper;
 import com.wzkj.hzyp.dao.mybatis.CashoutDetailMapper;
 import com.wzkj.hzyp.entity.BuserInfo;
 import com.wzkj.hzyp.entity.CashoutDetail;
+import com.wzkj.hzyp.entity.StoreInfo;
 import com.wzkj.hzyp.service.BuserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,9 @@ public class BuserServiceImpl implements BuserService {
 
     @Autowired
     private BuserInfoMapper bUserInfoMapper;
+
+    @Autowired
+    private StoreInfoRepository storeInfoRepository;
 
     @Override
     public boolean queryUserIsExist(String phone) {
@@ -87,6 +92,16 @@ public class BuserServiceImpl implements BuserService {
     public BuserInfo getBuserInfoByOpenId(String oepnId) {
         BuserInfo buserInfo = bUserInfoRepository.findByOpenId(oepnId);
         return buserInfo;
+    }
+
+    @Override
+    public boolean isReister(String id) {
+        StoreInfo storeInfo = storeInfoRepository.findByBUserId(id);
+        if(storeInfo != null){
+            return true;
+        }else {
+            return false;
+        }
     }
 
 

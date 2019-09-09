@@ -1,11 +1,13 @@
 package com.wzkj.hzyp.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.wzkj.hzyp.common.AjaxResponse;
 import com.wzkj.hzyp.common.ResponseCode;
 import com.wzkj.hzyp.entity.AuserInfo;
 import com.wzkj.hzyp.entity.BuserInfo;
 import com.wzkj.hzyp.entity.CashoutDetail;
 import com.wzkj.hzyp.entity.StoreInfo;
+import com.wzkj.hzyp.service.CommonService;
 import com.wzkj.hzyp.service.StoreInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +37,9 @@ public class UserController extends BaseController {
     @Autowired
     private StoreInfoService storeInfoService;
 
+    @Autowired
+    private CommonService commonService;
+
     @RequestMapping(value = "/getUserInfo",method = RequestMethod.POST)
     @ResponseBody
     @ApiOperation(value = "获取A端用户信息",notes = "name：姓名 totalMoney：佣金总收入 totalNumber：共推荐人数" +
@@ -46,7 +52,7 @@ public class UserController extends BaseController {
         Integer successNum = aUserService.getEntrySuccessNumber(id);
         Integer noCashout = aUserService.getNoCashNumber(id);
         Integer noCashoutFormat = noCashout == null ? 0 : noCashout;
-        Integer totalMoney = aUserService.getTotalMoney(id) == null ? 0 : aUserService.getTotalMoney(id);
+        Integer totalMoney = aUserService.getTotalMoney(id);
         Integer totalMoneyFormat = totalMoney == null ? 0 : totalMoney;
         Map<String,Object> map = new HashMap();
         map.put("name",name);
@@ -54,6 +60,7 @@ public class UserController extends BaseController {
         map.put("successNum",successNum);
         map.put("noCashout",noCashoutFormat);
         map.put("totalMoney",totalMoneyFormat);
+        map.put("type",0);
         return new AjaxResponse(ResponseCode.APP_SUCCESS,map);
     }
 
@@ -66,29 +73,12 @@ public class UserController extends BaseController {
         AuserInfo aUserInfo = getLoginUser();
         aUserInfo.setAge(age);
         aUserInfo.setName(name);
+        aUserInfo.setLastLoginTime(new Date());
         aUserService.updateUserInfo(aUserInfo);
         return new AjaxResponse(ResponseCode.APP_SUCCESS);
     }
 
-    /* *
-     * A端 申请提现
-     * @author zhaoMaoJie
-     * @date 2019/8/11 0011
-     */
-    @RequestMapping(value = "/cashout",method = RequestMethod.POST)
-    @ResponseBody
-    @ApiOperation(value = "A端用户申请提现",notes = "点击申请提现时调用")
-    public AjaxResponse cashout(){
-        AuserInfo aUserInfo = getLoginUser();
-        String id = aUserInfo.getId();
-        //首先改变岗位 金额 然后改变入职表中是否提现 iscash字段
-        List<Map<String,Object>> list = aUserService.getChangeJobInfo(id);
-        aUserService.changeJobMoney(list,id);
-        // 改变入职表字段
-        List<String> stringList = aUserService.getNeedChangeIds(id);
-        aUserService.updateEntryIsCashById(stringList);
-        return new AjaxResponse(ResponseCode.APP_SUCCESS);
-    }
+
 
     /* *
      * B端 获取用户信息
@@ -105,17 +95,53 @@ public class UserController extends BaseController {
         StoreInfo storeInfo = storeInfoService.getStoreByUserId(buserInfo.getId());
         String storeName = storeInfo.getName();
         Integer totalMoney = buserService.getAmountBalance(userId);
+        Integer totalMoneyFormat = totalMoney == null ? 0 :totalMoney;
         Integer jobNum = buserService.getJobNum(userId);
         Integer resumeNum = buserService.getResumeNum(userId);
         Integer sumMoney = buserService.getSumMoney(userId);
+        Integer sumMoneyFormat = sumMoney == null ? 0 : sumMoney;
         Map<String,Object> map = new HashMap();
         map.put("storeName",storeName);
-        map.put("totalMoney",totalMoney);
+        map.put("totalMoney",totalMoneyFormat);
         map.put("jobNum",jobNum);
         map.put("resumeNum",resumeNum);
-        map.put("sumMoney",sumMoney);
+        map.put("sumMoney",sumMoneyFormat);
+        map.put("type",1);
         return new AjaxResponse(ResponseCode.APP_SUCCESS,map);
     }
+
+    /* *
+     * A端获取提现信息列表
+     * @author zhaoMaoJie
+     * @date 2019/8/11 0011
+     */
+    @RequestMapping(value = "/getCashoutList",method = RequestMethod.POST)
+    @ResponseBody
+    public AjaxResponse getCashoutList(){
+        AuserInfo auserInfo = getLoginUser();
+        String userId = auserInfo.getId();
+        List list = aUserService.getCashoutList(userId);
+        PageInfo page = new PageInfo(list);
+        Map map = commonService.getMapByList(page,list);
+        return new AjaxResponse(ResponseCode.APP_SUCCESS,map);
+    }
+
+    /* *
+     * A端 申请提现 该方法暂时废弃
+     * @author zhaoMaoJie
+     * @date 2019/8/11 0011
+     */
+    @RequestMapping(value = "/cashout",method = RequestMethod.POST)
+    @ResponseBody
+    @ApiOperation(value = "A端用户申请提现",notes = "点击申请提现时调用")
+    public AjaxResponse cashout(){
+        AuserInfo aUserInfo = getLoginUser();
+        String id = aUserInfo.getId();
+        //首先改变岗位 金额 然后改变入职表中是否提现 iscash字段
+        aUserService.cashout(id);
+        return new AjaxResponse(ResponseCode.APP_SUCCESS);
+    }
+
 
     /* *
      * B端 获取花费详情
@@ -130,6 +156,26 @@ public class UserController extends BaseController {
         String userId = buserInfo.getId();
         List<CashoutDetail> list = buserService.getCashoutDetail(userId);
         return new AjaxResponse(ResponseCode.APP_SUCCESS,list);
+    }
+
+    /* *
+     * A端 申请提现 该方法暂时废弃
+     * @author zhaoMaoJie
+     * @date 2019/8/11 0011
+     */
+    @RequestMapping(value = "/cashout1",method = RequestMethod.POST)
+    @ResponseBody
+    @ApiOperation(value = "A端用户申请提现",notes = "点击申请提现时调用")
+    public AjaxResponse cashout1(){
+        AuserInfo aUserInfo = getLoginUser();
+        String id = aUserInfo.getId();
+        //首先改变岗位 金额 然后改变入职表中是否提现 iscash字段
+        List<Map<String,Object>> list = aUserService.getChangeJobInfo(id);
+        aUserService.changeJobMoney(list,id);
+        // 改变入职表字段
+        List<String> stringList = aUserService.getNeedChangeIds(id);
+        aUserService.updateEntryIsCashById(stringList);
+        return new AjaxResponse(ResponseCode.APP_SUCCESS);
     }
 
 

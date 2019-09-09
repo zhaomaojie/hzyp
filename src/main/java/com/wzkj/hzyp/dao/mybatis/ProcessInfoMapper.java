@@ -23,4 +23,8 @@ public interface ProcessInfoMapper {
     Integer getNewSortNumber(@Param("receviedId") String receviedId);
     int deleteByPrimaryKey(String id);
 
+    ProcessInfo selectByPrimaryKey(String id);
+
+
+
 }

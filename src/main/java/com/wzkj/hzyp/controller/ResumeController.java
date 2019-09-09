@@ -83,7 +83,7 @@ public class ResumeController extends BaseController {
             AuserInfo auserInfo = getLoginUser();
             String userId = auserInfo.getId();
             ResumeInfo resumeInfo = new ResumeInfo();
-            resumeInfo.setName(name);
+            resumeInfo.setName(name.toString());
             resumeInfo.setPhone(phone.toString());
             resumeInfo.setGender(gender);
             resumeInfo.setAge(age);
@@ -105,7 +105,7 @@ public class ResumeController extends BaseController {
             return new AjaxResponse(ResponseCode.APP_SUCCESS,"新增成功",map);
         }else {
             ResumeInfo resume = resumeInfoService.getResumeById(id);
-            resume.setName(name);
+            resume.setName(name.toString());
             resume.setPhone(phone.toString());
             resume.setGender(gender);
             resume.setAge(age);
@@ -269,6 +269,10 @@ public class ResumeController extends BaseController {
             }else {
                 map.put("isTemplate",false);
             }
+            StringBuilder message = new StringBuilder();
+            message.append("尊敬的求职者您好，现邀请你参加").append(":").append(storeInfo.getName()).append("公司的面试").append(",")
+                    .append("面试时间为:").append(DateUtil.dateToString(receviedInfo.getCreateTime())).append(",").append("预祝您面试通过!");
+            map.put("message",message);
             //给B端发送模板消息 end
             return new AjaxResponse(ResponseCode.APP_SUCCESS,map);
         }
@@ -381,10 +385,10 @@ public class ResumeController extends BaseController {
             @ApiImplicitParam(name = "phone",value = "电话，用于搜索",paramType = "query",required = true,dataType = "String")
     })
     @ApiOperation(value = "查看自己创建的简历",notes = "简历管理中使用")
-    public AjaxResponse myCandidate(Integer pageNum,Integer pageSize,Integer status,String name,String phone){
+    public AjaxResponse myCandidate(Integer pageNum,Integer pageSize,Integer status,String keyWord){
         String bUserId = getBuser().getId();
         PageHelper.startPage(pageNum,pageSize);
-        List<Map<String,Object>> list = resumeInfoService.myCandidate(bUserId,status,name,phone);
+        List<Map<String,Object>> list = resumeInfoService.myCandidate(bUserId,status,keyWord);
         PageInfo page = new PageInfo(list);
         Map map = commonService.getMapByList(page,list);
         return new AjaxResponse(ResponseCode.APP_SUCCESS,map);

@@ -1,6 +1,7 @@
 package com.wzkj.hzyp.dao.mybatis;
 
 import com.wzkj.hzyp.entity.AuserInfo;
+import com.wzkj.hzyp.vo.CashOutListVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -56,6 +57,27 @@ public interface AuserInfoMapper {
      * @date 2019/8/11 0011
      */
     List<String> getNeedChangeIds(@Param("aUserId") String aUserId);
+
+    /* *
+     * 获取可提现列表
+     * @author zhaoMaoJie
+     * @date 2019/9/9 0009
+     */
+    List<CashOutListVO> getCashoutList(@Param("aUserId") String aUserId);
+
+    /* *
+     * 提现操作
+     * @author zhaoMaoJie
+     * @date 2019/9/9 0009
+     */
+    Integer cashout(@Param("aUserId") String aUserId);
+
+    /* *
+     * 修改状态
+     * @author zhaoMaoJie
+     * @date 2019/9/9 0009
+     */
+    void updateEntryInfoIsCash(@Param("aUserId") String aUserId);
 
     int deleteByPrimaryKey(String id);
 

@@ -14,6 +14,7 @@ import com.wzkj.hzyp.entity.JobInfo;
 import com.wzkj.hzyp.service.AUserService;
 import com.wzkj.hzyp.service.EntryInfoService;
 import com.wzkj.hzyp.utils.StringUtils;
+import com.wzkj.hzyp.vo.CashOutListVO;
 import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -163,6 +164,18 @@ public class UserServiceImpl implements AUserService {
     public AuserInfo getAuserInfoByOpenId(String openId) {
         AuserInfo auserInfo = repository.findByOpenId(openId);
         return auserInfo;
+    }
+
+    @Override
+    public List<CashOutListVO> getCashoutList(String aUserId) {
+        List<CashOutListVO> list = mapper.getCashoutList(aUserId);
+        return list;
+    }
+
+    @Override
+    public void cashout(String aUserId) {
+        mapper.cashout(aUserId);
+        mapper.updateEntryInfoIsCash(aUserId);
     }
 
 

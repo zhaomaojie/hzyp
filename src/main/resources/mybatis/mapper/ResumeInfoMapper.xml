@@ -130,7 +130,9 @@
 	b.id resumeId,
     b.`status`,
 	c.job_name jobName,
-	c.id jobId
+	c.id jobId,
+    b.avatar,
+    b.name
     FROM
 	b_recevied_info a
     INNER JOIN c_resume_info b ON a.resume_id = b.id
@@ -142,11 +144,8 @@
     <if test="status != null">
       AND a.status = #{status}
     </if>
-    <if test="name != null and name != ''">
-      AND b.name LIKE "%"#{name}"%"
-    </if>
-    <if test="phone != null and phone != ''">
-      AND b.phone LIKE "%"#{phone}"%"
+    <if test="keyWord != null and keyWord != ''">
+      AND b.name LIKE concat(concat("%",#{keyWord}),"%") OR b.phone LIKE concat(concat("%",#{keyWord}),"%")
     </if>
     ORDER BY a.create_time ASC
   </select>

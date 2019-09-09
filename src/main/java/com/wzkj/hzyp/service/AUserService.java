@@ -1,6 +1,7 @@
 package com.wzkj.hzyp.service;
 
 import com.wzkj.hzyp.entity.AuserInfo;
+import com.wzkj.hzyp.vo.CashOutListVO;
 
 import java.util.List;
 import java.util.Map;
@@ -109,4 +110,18 @@ public interface AUserService {
      * @date 2019/8/15 0015
      */
     AuserInfo getAuserInfoByOpenId(String openId);
+
+    /* *
+     * 获取可提现列表
+     * @author zhaoMaoJie
+     * @date 2019/9/9 0009
+     */
+    List<CashOutListVO> getCashoutList(String aUserId);
+
+    /* *
+     * 提现操作
+     * @author zhaoMaoJie
+     * @date 2019/9/9 0009
+     */
+    void cashout(String aUserId);
 }

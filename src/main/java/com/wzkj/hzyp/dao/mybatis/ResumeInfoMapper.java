@@ -36,7 +36,7 @@ public interface ResumeInfoMapper {
      * @author zhaoMaoJie
      * @date 2019/8/11 0011
      */
-    List<Map<String, Object>> myCandidate(@Param("bUserId") String bUserId,@Param("status") Integer status,@Param("name")String name,@Param("phone") String phone);
+    List<Map<String, Object>> myCandidate(@Param("bUserId") String bUserId,@Param("status") Integer status,@Param("keyWord")String keyWord);
 
     /* *
      * 获取简历推荐记录

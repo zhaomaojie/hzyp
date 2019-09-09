@@ -183,12 +183,12 @@ public class JobController extends BaseController {
     })
     @ApiOperation(value = "B端 保存/修改岗位信息",notes = "赏金等 不可以修改")
     public AjaxResponse saveJob(String id,String industryCode,String jobName,String description,Integer num,Integer educationDegree,
-                                Integer workExperience,Integer ageMin,Integer ageMax,Integer probation,String trialTime,String trialSalary,String officialSalary,
+                                Integer workExperience,Integer minAge,Integer maxAge,Integer probation,String trialTime,String trialSalary,String officialSalary,
                                 String avgSalary,Integer reward,Integer overtime){
         //reward overtime total_amount 应该为Integer
         BuserInfo buserInfo = getBuser();
         String bUserId = buserInfo.getId();
-        StoreInfo storeInfo = storeInfoService.getStoreInfoById(bUserId);
+        StoreInfo storeInfo = storeInfoService.getStoreByUserId(bUserId);
         String storeId = storeInfo.getId();
         //新增 岗位
         if(StringUtils.isBlank(id)){
@@ -201,8 +201,8 @@ public class JobController extends BaseController {
             jobInfo.setNum(num);
             jobInfo.setEducationDegree(educationDegree);
             jobInfo.setWorkExperience(workExperience);
-            jobInfo.setAgeMin(ageMin);
-            jobInfo.setAgeMax(ageMax);
+            jobInfo.setAgeMin(minAge);
+            jobInfo.setAgeMax(maxAge);
             jobInfo.setProbation(probation);
             jobInfo.setTrialTime(trialTime);
             jobInfo.setTrialSalary(trialSalary);
@@ -213,8 +213,9 @@ public class JobController extends BaseController {
             jobInfo.setTotalAmount(num * reward);
             jobInfo.setStatus(0);
             jobInfo.setDelFlag(0);
-            Integer receivedNum = (int)Math.ceil(num * 1.3);
-            jobInfo.setReceviedResumeNumber(receivedNum);
+            Integer total = (int)Math.ceil(num * 1.3);
+            jobInfo.setReceviedResumeNumber(0);
+            jobInfo.setTotalResumeNumber(total);
             jobInfo.setCreateTime(new Date());
             jobInfo.setUpdateTime(new Date());
             jobInfoService.saveJobInfo(jobInfo);
@@ -227,8 +228,8 @@ public class JobController extends BaseController {
             jobInfo.setNum(num);
             jobInfo.setEducationDegree(educationDegree);
             jobInfo.setWorkExperience(workExperience);
-            jobInfo.setAgeMin(ageMin);
-            jobInfo.setAgeMax(ageMax);
+            jobInfo.setAgeMin(minAge);
+            jobInfo.setAgeMax(maxAge);
             jobInfo.setProbation(probation);
             jobInfo.setTrialTime(trialTime);
             jobInfo.setTrialSalary(trialSalary);

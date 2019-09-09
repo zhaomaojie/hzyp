@@ -14,6 +14,13 @@
     <result column="verdify_code_time" property="verdifyCodeTime" jdbcType="TIMESTAMP" />
     <result column="open_id" property="openId" jdbcType="VARCHAR" />
   </resultMap>
+
+  <resultMap id="CashOutListVO" type="com.wzkj.hzyp.vo.CashOutListVO">
+    <result column="jobName" property="jobName" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="reward" property="reward" jdbcType="VARCHAR" />
+    <result column="entryTime" property="entryTime" jdbcType="TIMESTAMP" />
+  </resultMap>
   <sql id="Base_Column_List" >
     id, age, create_time, del_flag, empower_phone, last_login_time, name, update_time, 
     verify_code, verdify_code_time,open_id
@@ -98,6 +105,65 @@
       AND a.a_user_id = #{aUserId}
     </if>
   </select>
+
+  <select id="getCashoutList" resultMap="CashOutListVO">
+    SELECT
+    b.job_name jobName,
+    b.reward,
+    c.name,
+    a.entry_time entryTime
+    FROM
+    c_entry_info a
+    INNER JOIN b_job_info b ON a.job_id = b.id
+    LEFT JOIN c_resume_info c ON a.resume_id = c.id
+    WHERE
+    1 = 1
+    <if test="aUserId != null and aUserId !=''">
+      AND a.a_user_Id = #{aUserId}
+      AND  NOW() > a.over_datetime
+      AND a.is_cash = 0
+    </if>
+    ORDER BY a.entry_time DESC
+  </select>
+
+<update id="cashout" >
+  UPDATE b_job_info b
+  INNER JOIN (
+  SELECT
+  sum(b.reward) money,
+  b.id jobId
+  FROM
+  c_entry_info a
+  INNER JOIN b_job_info b ON a.job_id = b.id
+  LEFT JOIN c_resume_info c ON a.resume_id = c.id
+  WHERE
+  1 = 1
+  <if test="aUserId != null and aUserId != ''">
+    AND a.a_user_Id = #{aUserId}
+  </if>
+  <![CDATA[ AND a.over_datetime < NOW() ]]>
+  AND a.is_cash = 0
+  GROUP BY
+  b.id
+  ) x ON b.id = x.jobId
+  SET b.total_amount = b.total_amount - x.money
+</update>
+  <update id="ss">
+    update 	c_entry_info a SET a.is_cash = 1 WHERE a.id in (SELECT id FROM(
+    SELECT
+    a.id
+    FROM
+    c_entry_info a
+    INNER JOIN b_job_info b ON a.job_id = b.id
+    LEFT JOIN c_resume_info c ON a.resume_id = c.id
+    WHERE
+    1 = 1
+    <if test="aUserId != null and aUserId != ''">
+      AND a.a_user_Id = #{aUserId}
+    </if>
+    <![CDATA[ AND a.over_datetime < NOW() ]]>
+    AND a.is_cash = 0) x )
+  </update>
 
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 

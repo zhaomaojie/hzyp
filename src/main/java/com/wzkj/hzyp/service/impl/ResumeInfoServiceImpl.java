@@ -110,8 +110,8 @@ public class ResumeInfoServiceImpl implements ResumeInfoService {
     }
 
     @Override
-    public List<Map<String, Object>> myCandidate(String bUserId,Integer status,String name,String phone) {
-        List<Map<String, Object>> list = resumeInfoMapper.myCandidate(bUserId, status, name, phone);
+    public List<Map<String, Object>> myCandidate(String bUserId,Integer status,String keyWord) {
+        List<Map<String, Object>> list = resumeInfoMapper.myCandidate(bUserId, status, keyWord);
         return list;
     }
 

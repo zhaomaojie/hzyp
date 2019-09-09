@@ -84,7 +84,7 @@ public interface ResumeInfoService {
      * @author zhaoMaoJie
      * @date 2019/8/11 0011
      */
-    List<Map<String,Object>> myCandidate(String bUserId,Integer status,String name,String phone);
+    List<Map<String,Object>> myCandidate(String bUserId,Integer status,String keyWord);
 
     /* *
      * 绑定头像到简历页
