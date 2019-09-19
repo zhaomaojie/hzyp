@@ -1,73 +1,70 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.wzkj.hzyp.dao.mybatis.ProcessInfoMapper">
-    <resultMap id="BaseResultMap" type="com.wzkj.hzyp.entity.ProcessInfo">
-        <id column="id" property="id" jdbcType="VARCHAR"/>
-        <result column="recevied_id" property="receviedId" jdbcType="VARCHAR"/>
-        <result column="b_user_id" property="bUserId" jdbcType="VARCHAR"/>
-        <result column="a_user_id" property="aUserId" jdbcType="VARCHAR"/>
-        <result column="status" property="status" jdbcType="INTEGER"/>
-        <result column="is_feedback" property="isFeedback" jdbcType="INTEGER"/>
-        <result column="feedback_content" property="feedbackId" jdbcType="VARCHAR"/>
-        <result column="last_handle_time" property="lastHandleTime" jdbcType="TIMESTAMP"/>
-        <result column="del_flag" property="delFlag" jdbcType="INTEGER"/>
-        <result column="process_content" property="processContent" jdbcType="VARCHAR"/>
-        <result column="owner" property="owner" jdbcType="INTEGER"/>
-        <result column="is_interview" property="isInterview" jdbcType="INTEGER"/>
-        <result column="is_entry" property="isEntry" jdbcType="INTEGER"/>
-        <result column="interview_time" property="interviewTime" jdbcType="TIMESTAMP"/>
-        <result column="entry_time" property="entryTime" jdbcType="TIMESTAMP"/>
-        <result column="is_quit" property="isQuit" jdbcType="INTEGER"/>
-        <result column="quit_time" property="quitTime" jdbcType="TIMESTAMP"/>
-        <result column="is_end" property="isEnd" jdbcType="INTEGER"/>
-        <result column="sort_number" property="sortNumber" jdbcType="INTEGER"/>
-        <result column="button_a" property="buttonA" jdbcType="VARCHAR"/>
-        <result column="button_b" property="buttonB" jdbcType="VARCHAR"/>
-    </resultMap>
-    <sql id="Base_Column_List">
-    id, recevied_id, b_user_id, a_user_id, status, is_feedback, feedback_content, last_handle_time, 
+<mapper namespace="com.wzkj.hzyp.dao.mybatis.ProcessInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.wzkj.hzyp.entity.ProcessInfo" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="recevied_id" property="receviedId" jdbcType="VARCHAR" />
+    <result column="b_user_id" property="bUserId" jdbcType="VARCHAR" />
+    <result column="a_user_id" property="aUserId" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="is_feedback" property="isFeedback" jdbcType="INTEGER" />
+    <result column="feedback_id" property="feedbackId" jdbcType="VARCHAR" />
+    <result column="last_handle_time" property="lastHandleTime" jdbcType="TIMESTAMP" />
+    <result column="del_flag" property="delFlag" jdbcType="INTEGER" />
+    <result column="process_content" property="processContent" jdbcType="VARCHAR" />
+    <result column="owner" property="owner" jdbcType="INTEGER" />
+    <result column="is_interview" property="isInterview" jdbcType="INTEGER" />
+    <result column="is_entry" property="isEntry" jdbcType="INTEGER" />
+    <result column="interview_time" property="interviewTime" jdbcType="TIMESTAMP" />
+    <result column="entry_time" property="entryTime" jdbcType="TIMESTAMP" />
+    <result column="is_quit" property="isQuit" jdbcType="INTEGER" />
+    <result column="quit_time" property="quitTime" jdbcType="TIMESTAMP" />
+    <result column="is_end" property="isEnd" jdbcType="INTEGER" />
+    <result column="sort_number" property="sortNumber" jdbcType="INTEGER" />
+    <!--<result column="button_a" property="buttonA" javaType="com.wzkj.hzyp.entity.ProcessInfo" typeHandler="com.wzkj.hzyp.utils.JsonTypeHandler" />-->
+    <!--<result column="button_b" property="buttonB" javaType="com.wzkj.hzyp.entity.ProcessInfo" typeHandler="com.wzkj.hzyp.utils.JsonTypeHandler" />-->
+    <result column="button_a" property="buttonA" jdbcType="VARCHAR" />
+    <result column="button_b" property="buttonB" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, recevied_id, b_user_id, a_user_id, status, is_feedback, feedback_id, last_handle_time, 
     del_flag, process_content, owner, is_interview, is_entry, interview_time, entry_time, 
-    is_quit, quit_time,is_end,sort_number,button_a,button_b
+    is_quit, quit_time, is_end, sort_number, button_a, button_b,create_time
   </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from b_process_info
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+
 
     <select id="getProcessInfoByReceviedId" resultType="java.util.HashMap">
-    SELECT
-	  *
-    FROM
-	b_process_info a
-    WHERE
-	1 = 1
-    <if test="receviedId != null and receviedId != ''">
-        AND a.recevied_id = #{receviedId}
-    </if>
-    ORDER BY a.sort_number ASC
-
-  </select>
-
-  <select id="getNewSortNumber"  resultType="java.lang.Integer">
       SELECT
-	  max(a.sort_number)
+      *
       FROM
-	  b_process_info a
+      b_process_info a
       WHERE
-	  1 = 1
-	  <if test="receviedId != null and receviedId != ''">
-          AND a.recevied_id = #{receviedId}
+      1 = 1
+      <if test="receviedId != null and receviedId != ''">
+        AND a.recevied_id = #{receviedId}
+      </if>
+      ORDER BY a.sort_number ASC
+
+    </select>
+
+    <select id="getNewSortNumber"  resultType="java.lang.Integer">
+      SELECT
+      max(a.sort_number)
+      FROM
+      b_process_info a
+      WHERE
+      1 = 1
+      <if test="receviedId != null and receviedId != ''">
+        AND a.recevied_id = #{receviedId}
       </if>
 
-  </select>
-
-
-    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
-        select
-        <include refid="Base_Column_List"/>
-        from b_process_info
-        where id = #{id,jdbcType=VARCHAR}
     </select>
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
-    delete from b_process_info
-    where id = #{id,jdbcType=VARCHAR}
-  </delete>
-
 
 </mapper>

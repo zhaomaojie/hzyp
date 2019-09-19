@@ -60,7 +60,12 @@
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>1.1.1</version>
+            <version>1.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.4.0</version>
         </dependency>
 
         <!--httpClient-->
@@ -175,6 +180,12 @@
             <version>3.4.0</version>
         </dependency>
 
+        <!--在实体中使用json-->
+        <dependency>
+            <groupId>com.vladmihalcea</groupId>
+            <artifactId>hibernate-types-5</artifactId>
+            <version>1.2.0</version>
+        </dependency>
     </dependencies>
 
 

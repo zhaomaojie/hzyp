@@ -72,6 +72,7 @@ public class JobController extends BaseController {
         if(StringUtils.isBlank(id)){
             return new AjaxResponse(ResponseCode.APP_FAIL,"id不能为空!");
         }else {
+            System.out.println(id);
             JobInfoVO jobInfo = jobInfoService.jobDetail(id);
             return new AjaxResponse(ResponseCode.APP_SUCCESS,jobInfo);
         }
@@ -183,8 +184,8 @@ public class JobController extends BaseController {
     })
     @ApiOperation(value = "B端 保存/修改岗位信息",notes = "赏金等 不可以修改")
     public AjaxResponse saveJob(String id,String industryCode,String jobName,String description,Integer num,Integer educationDegree,
-                                Integer workExperience,Integer minAge,Integer maxAge,Integer probation,String trialTime,String trialSalary,String officialSalary,
-                                String avgSalary,Integer reward,Integer overtime){
+                                Integer workExperience,Integer minAge,Integer maxAge,Integer probation,String trialTime,String interviewTime,
+                                String trialSalary,String officialSalary,String avgSalary,Integer reward,Integer overtime){
         //reward overtime total_amount 应该为Integer
         BuserInfo buserInfo = getBuser();
         String bUserId = buserInfo.getId();
@@ -218,6 +219,8 @@ public class JobController extends BaseController {
             jobInfo.setTotalResumeNumber(total);
             jobInfo.setCreateTime(new Date());
             jobInfo.setUpdateTime(new Date());
+            jobInfo.setIsPay(0);
+            jobInfo.setInterviewTime(interviewTime);
             jobInfoService.saveJobInfo(jobInfo);
             return new AjaxResponse(ResponseCode.APP_SUCCESS);
         }else { //修改
@@ -225,7 +228,7 @@ public class JobController extends BaseController {
             jobInfo.setIndustryCode(industryCode);
             jobInfo.setJobName(jobName);
             jobInfo.setDescription(description);
-            jobInfo.setNum(num);
+//            jobInfo.setNum(num);
             jobInfo.setEducationDegree(educationDegree);
             jobInfo.setWorkExperience(workExperience);
             jobInfo.setAgeMin(minAge);
@@ -235,6 +238,7 @@ public class JobController extends BaseController {
             jobInfo.setTrialSalary(trialSalary);
             jobInfo.setOfficialSalary(officialSalary);
             jobInfo.setAvgSalary(avgSalary);
+            jobInfo.setInterviewTime(interviewTime);
             //赏金是否能改动？ 赏金不能改动 因为履约金已经支付过
             jobInfo.setReward(reward);
             return new AjaxResponse(ResponseCode.APP_SUCCESS);

@@ -8,6 +8,7 @@ import com.wzkj.hzyp.entity.BuserInfo;
 import com.wzkj.hzyp.entity.CashoutDetail;
 import com.wzkj.hzyp.entity.StoreInfo;
 import com.wzkj.hzyp.service.BuserService;
+import com.wzkj.hzyp.vo.CashOutListVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -84,9 +85,11 @@ public class BuserServiceImpl implements BuserService {
     }
 
     @Override
-    public List<CashoutDetail> getCashoutDetail(String userId) {
-        return null;
+    public List<CashOutListVO> getCashoutDetail(String userId) {
+        List<CashOutListVO> list = bUserInfoMapper.getCashoutDetail(userId);
+        return list;
     }
+
 
     @Override
     public BuserInfo getBuserInfoByOpenId(String oepnId) {

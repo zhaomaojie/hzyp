@@ -70,6 +70,10 @@ public class StoreInfo {
     @Column(name = "b_user_id")
     private String bUserId;
 
+    /**  B端头像 */
+    @Column(name = "AVATAR")
+    private String avatar;
+
     public String getId() {
         return id;
     }
@@ -180,5 +184,13 @@ public class StoreInfo {
 
     public void setbUserId(String bUserId) {
         this.bUserId = bUserId == null ? null : bUserId.trim();
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }

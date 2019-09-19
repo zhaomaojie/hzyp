@@ -2,6 +2,7 @@ package com.wzkj.hzyp.service;
 
 import com.wzkj.hzyp.entity.BuserInfo;
 import com.wzkj.hzyp.entity.CashoutDetail;
+import com.wzkj.hzyp.vo.CashOutListVO;
 import io.swagger.models.auth.In;
 
 import java.util.List;
@@ -74,7 +75,7 @@ public interface BuserService {
      * @author zhaoMaoJie
      * @date 2019/8/12 0012
      */
-    List<CashoutDetail> getCashoutDetail(String userId);
+    List<CashOutListVO> getCashoutDetail(String userId);
 
     /* *
      *

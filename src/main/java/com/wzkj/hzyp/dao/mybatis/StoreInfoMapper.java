@@ -3,6 +3,7 @@ package com.wzkj.hzyp.dao.mybatis;
 import com.wzkj.hzyp.entity.StoreInfo;
 
 public interface StoreInfoMapper {
+
     int deleteByPrimaryKey(String id);
 
     int insert(StoreInfo record);

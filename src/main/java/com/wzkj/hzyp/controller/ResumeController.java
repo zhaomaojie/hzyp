@@ -4,6 +4,8 @@ import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.api.impl.WxMaServiceImpl;
 import cn.binarywang.wx.miniapp.bean.WxMaTemplateData;
 import cn.binarywang.wx.miniapp.config.WxMaInMemoryConfig;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.wzkj.hzyp.common.AjaxResponse;
@@ -11,12 +13,14 @@ import com.wzkj.hzyp.common.ResponseCode;
 import com.wzkj.hzyp.entity.*;
 import com.wzkj.hzyp.service.*;
 import com.wzkj.hzyp.utils.DateUtil;
+import com.wzkj.hzyp.utils.ImageConfig;
 import com.wzkj.hzyp.utils.StringUtils;
 import com.wzkj.hzyp.vo.ResumeRecordVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,6 +58,9 @@ public class ResumeController extends BaseController {
 
     @Autowired
     private CommonService commonService;
+
+    @Autowired
+    private ImageConfig imageConfig;
 
     /* *
      * 保存/修改简历
@@ -98,6 +105,11 @@ public class ResumeController extends BaseController {
             resumeInfo.setStatus(0);
             resumeInfo.setPastWork(pastWork);
             resumeInfo.setIntentionalWork(intentionalWork);
+            if(gender == 0){
+                resumeInfo.setAvatar(imageConfig.getResumeMan());
+            }else {
+                resumeInfo.setAvatar(imageConfig.getResumeWoman());
+            }
             resumeInfoService.saveResume(resumeInfo);
             String newId = resumeInfo.getId();
             Map<String,Object> map = new HashMap();
@@ -116,6 +128,11 @@ public class ResumeController extends BaseController {
             resume.setNativePlace(nativePlace);
             resume.setPastWork(pastWork);
             resume.setIntentionalWork(intentionalWork);
+            if(gender == 0){
+                resume.setAvatar(imageConfig.getResumeMan());
+            }else {
+                resume.setAvatar(imageConfig.getResumeWoman());
+            }
             resumeInfoService.saveResume(resume);
             String newId = resume.getId();
             Map<String,Object> map = new HashMap();
@@ -135,13 +152,15 @@ public class ResumeController extends BaseController {
         if(StringUtils.isBlank(id) || file.isEmpty()){
             return new AjaxResponse(ResponseCode.APP_FAIL,"参数有误！");
         }
-        // 执行绑定头像 首先判空 然后 上传头像得到webURL地址 然后绑定到简历
+        //绑定头像 首先判断是否有上传头像 如果有就执行上传然后绑定到简历对象
+        //如果没有上传 那么根据性别自动绑定默认图片
         boolean isBind = resumeInfoService.bindingAvatar(id, file);
         if(isBind){
             return new AjaxResponse(ResponseCode.APP_SUCCESS,"绑定成功！");
         }else {
-            return new AjaxResponse(ResponseCode.APP_FAIL,"绑定失败！");
+            return new AjaxResponse(ResponseCode.APP_FAIL,"绑定失败");
         }
+
 
     }
 
@@ -176,9 +195,9 @@ public class ResumeController extends BaseController {
             @ApiImplicitParam(name = "interviewTime",value = "面试时间",paramType = "query",required = true,dataType = "String")
             })
     @ApiOperation(value = "A端 推送简历",notes = "前端需判断相关硬属性")
-    public AjaxResponse pushResume(String jobId,String resumeId,String interviewDate,String interviewTime,String  formId){
+    public AjaxResponse pushResume(String jobId,String resumeId,String interviewDate,String  formId){
         if(StringUtils.isBlank(jobId) || StringUtils.isBlank(resumeId)
-                || StringUtils.isBlank(interviewDate) || StringUtils.isBlank(interviewTime)){
+                || StringUtils.isBlank(interviewDate) ){
             return new AjaxResponse(ResponseCode.APP_FAIL,"数据有误！");
         }else {
             // 推送简历 首先要判断岗位的剩余情况 是否允许推送
@@ -206,9 +225,37 @@ public class ResumeController extends BaseController {
             receviedInfo.setLatestFeedback("将于" + interviewDate + "日" + "面试");
             receviedInfo.setStatus(0);
             resumeInfoService.pushResume(receviedInfo);
-            //简历推送成功后 在流程表中加入该数据
+            //简历推送成功后 在流程表中加入该数据 加入两条数据 一条短信模板 一条流程内容
             ResumeInfo resumeInfo = resumeInfoService.getResumeById(resumeId);
             String receviedId = receviedInfo.getId();
+            //短信模板
+            String storeId = jobInfo.getbStoreId();
+            StoreInfo storeInfo = storeInfoService.getStoreInfoById(storeId);
+            String address = storeInfo.getAddress();
+            ProcessInfo newProcessInfo = new ProcessInfo();
+            newProcessInfo.setReceviedId(receviedId);
+            newProcessInfo.setaUserId(aUserId);
+            newProcessInfo.setbUserId(bUserId);
+            newProcessInfo.setSortNumber(0);
+            newProcessInfo.setOwner(0);
+            newProcessInfo.setDelFlag(0);
+            StringBuilder sms = new StringBuilder();
+            sms.append("尊敬的求职者").append(":").append(resumeInfo.getName()).append("你好").append(",")
+                    .append("现邀请您参加").append(storeInfo.getName())
+                    .append(jobInfo.getJobName()).append("岗位的面试").append("。")
+                    .append("面试时间为").append(":").append(interviewDate.substring(0,interviewDate.lastIndexOf(":"))).append(",")
+                    .append("面试地址为").append(":").append(address).append("。")
+                    .append("请准时参加").append(",").append("预祝您面试通过");
+            newProcessInfo.setProcessContent(sms.toString());
+            newProcessInfo.setCreateTime(new Date());
+            List<JSONObject> json = commonService.getJsonList("A","sms",false);
+            String jsonStr = json.toString().replace("\\","");
+            newProcessInfo.setButtonA(jsonStr);
+            newProcessInfo.setIsFeedback(1);
+            newProcessInfo.setStatus(1);
+            processInfoService.saveProcessInfo(newProcessInfo);
+
+            //流程反馈
             ProcessInfo processInfo = new ProcessInfo();
             processInfo.setReceviedId(receviedId);
             processInfo.setaUserId(aUserId);
@@ -216,13 +263,22 @@ public class ResumeController extends BaseController {
             processInfo.setStatus(1);
             processInfo.setIsFeedback(0);
             processInfo.setDelFlag(0);
-            String processContent = resumeInfo.getName() + "将于" + interviewDate + interviewTime + "参加面试";
-            processInfo.setProcessContent(processContent);
+            String processContent = resumeInfo.getName() + "将于" + interviewDate + "参加面试";
+            String begin = processContent.substring(0,processContent.indexOf("日") + 6);
+            String end = processContent.substring(processContent.indexOf("日") + 6);
+            String contentFormat = begin + "-" + end;
+            processInfo.setProcessContent(contentFormat);
             processInfo.setOwner(0);
 //            Integer sortNumber =  processInfoService.getNewSortNumber(receviedId);
             processInfo.setSortNumber(1);
-            processInfo.setButtonA("取消简历");
-            processInfo.setButtonB("面试通过|未到场|面试不通过|修改面试时间");
+
+            List<JSONObject> jsonObjects = commonService.getJsonList("A","interviewFeedback",false);
+            List<JSONObject> jsonB = commonService.getJsonList("B","interviewFeedback",false);
+            String str = jsonObjects.toString().replace("\\","");
+            String str1 = jsonB.toString().replace("\\","");
+            processInfo.setButtonA(str);
+            processInfo.setButtonB(str1);
+            processInfo.setCreateTime(new Date());
             processInfoService.saveProcessInfo(processInfo);
             //推送成功后改变原始岗位的简历数 收藏岗位的状态 B端接收简历表加入数据 流程表加入内容
             //改变岗位收到的简历数
@@ -235,14 +291,14 @@ public class ResumeController extends BaseController {
             resumeInfoService.saveResume(resumeInfo);
             //推送简历后 应该给求职者发送面试短信 取消短信平台 暂时不发短信
             //给前端返回面试信息
-            Map<String,Object> map = new HashMap();
-            String storeId = jobInfo.getbStoreId();
-            StoreInfo storeInfo = storeInfoService.getStoreInfoById(storeId);
-            String address = storeInfo.getAddress().trim();
-            map.put("name",resumeInfo.getName());
-            map.put("date",interviewDate);
-            map.put("time",interviewTime);
-            map.put("address",address);
+//            Map<String,Object> map = new HashMap();
+//            String storeId = jobInfo.getbStoreId();
+//            StoreInfo storeInfo = storeInfoService.getStoreInfoById(storeId);
+//            String address = storeInfo.getAddress().trim();
+//            map.put("name",resumeInfo.getName());
+//            map.put("date",interviewDate);
+////            map.put("time",interviewTime);
+//            map.put("address",address);
             //给B端发送模板消息 start
             //1,配置小程序信息
             WxMaInMemoryConfig wxConfig = wxTemplateService.getWxConfig();
@@ -263,18 +319,18 @@ public class ResumeController extends BaseController {
             //3，设置推送消息
             BuserInfo buserInfo = buserService.getBuserById(bUserId);
             String openId = buserInfo.getOpenId();
-            boolean isSuccess = wxTemplateService.pushResumeTemplate(openId,formId,templateDataList,wxMaService);
-            if(isSuccess){
-                map.put("isTemplate",true);
-            }else {
-                map.put("isTemplate",false);
-            }
-            StringBuilder message = new StringBuilder();
-            message.append("尊敬的求职者您好，现邀请你参加").append(":").append(storeInfo.getName()).append("公司的面试").append(",")
-                    .append("面试时间为:").append(DateUtil.dateToString(receviedInfo.getCreateTime())).append(",").append("预祝您面试通过!");
-            map.put("message",message);
+            wxTemplateService.pushResumeTemplate(openId,formId,templateDataList,wxMaService);
+//            if(isSuccess){
+//                map.put("isTemplate",true);
+//            }else {
+//                map.put("isTemplate",false);
+//            }
+//            StringBuilder message = new StringBuilder();
+//            message.append("尊敬的求职者您好，现邀请你参加").append(":").append(storeInfo.getName()).append("公司的面试").append(",")
+//                    .append("面试时间为:").append(DateUtil.dateToString(receviedInfo.getCreateTime())).append(",").append("预祝您面试通过!");
+//            map.put("message",message);
             //给B端发送模板消息 end
-            return new AjaxResponse(ResponseCode.APP_SUCCESS,map);
+            return new AjaxResponse(ResponseCode.APP_SUCCESS);
         }
     }
 

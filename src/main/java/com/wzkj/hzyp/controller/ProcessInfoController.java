@@ -1,10 +1,10 @@
 package com.wzkj.hzyp.controller;
 
+import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageInfo;
 import com.wzkj.hzyp.common.AjaxResponse;
 import com.wzkj.hzyp.common.ResponseCode;
 import com.wzkj.hzyp.entity.*;
-import com.wzkj.hzyp.entity.wxTemplate.TemplateData;
-import com.wzkj.hzyp.entity.wxTemplate.WxMssVo;
 import com.wzkj.hzyp.service.*;
 import com.wzkj.hzyp.utils.DateUtil;
 import com.wzkj.hzyp.utils.StringUtils;
@@ -13,30 +13,13 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.List;
 
-import cn.binarywang.wx.miniapp.api.WxMaService;
-import cn.binarywang.wx.miniapp.api.impl.WxMaServiceImpl;
-import cn.binarywang.wx.miniapp.bean.WxMaTemplateData;
-import cn.binarywang.wx.miniapp.bean.WxMaTemplateMessage;
-import cn.binarywang.wx.miniapp.config.WxMaInMemoryConfig;
-import me.chanjar.weixin.common.error.WxErrorException;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @user zhaoMaoJie
@@ -44,6 +27,7 @@ import java.util.Map;
  */
 @RequestMapping("/process")
 @Controller
+//@RestController
 @Api(value = "流程相关的接口",tags = "流程相关的controller")
 public class ProcessInfoController extends BaseController {
 
@@ -63,7 +47,7 @@ public class ProcessInfoController extends BaseController {
     private ReceviedInfoService receviedInfoService;
 
     @Autowired
-    private WxTemplateService wxTemplateService;
+    private CommonService commonService;
 
 
     /* *
@@ -79,8 +63,10 @@ public class ProcessInfoController extends BaseController {
         if(StringUtils.isBlank(receviedId)){
             return new AjaxResponse(ResponseCode.APP_FAIL,"id不能为空！");
         }else {
-            List<ProcessInfo> processInfoList = processInfoService.getProcessInfoByReceviedId(receviedId);
-            return new AjaxResponse(ResponseCode.APP_SUCCESS,processInfoList);
+            List<ProcessInfo> list = processInfoService.getProcessInfoByReceviedId(receviedId);
+            PageInfo page = new PageInfo(list);
+            Map map = commonService.getMapByList(page,list);
+            return new AjaxResponse(ResponseCode.APP_SUCCESS,map);
         }
     }
 
@@ -123,7 +109,7 @@ public class ProcessInfoController extends BaseController {
      * @author zhaoMaoJie
      * @date 2019/8/7 0007
      */
-    @RequestMapping(value = "/interviedFeedback",method = RequestMethod.POST)
+    @RequestMapping(value = "/interviewFeedback",method = RequestMethod.POST)
     @ResponseBody
     @ApiImplicitParams({@ApiImplicitParam(name = "processInfoId",value = "流程id",paramType = "query",required = true,dataType = "String"),
             @ApiImplicitParam(name = "feedbackStatus",value = "反馈状态 0 面试通过 1未到场 2未通过 3更改面试时间",paramType = "query",required = true,dataType = "String"),
@@ -131,14 +117,18 @@ public class ProcessInfoController extends BaseController {
             @ApiImplicitParam(name = "interviewTime",value = "面试时间",paramType = "query",required = true,dataType = "date")
     })
     @ApiOperation(value = "面试反馈",notes = "根据相应状态做出相应操作")
-    public AjaxResponse interviedFeedback(String processInfoId, Integer feedbackStatus, Date entryTime,Date interviewTime){
+    public AjaxResponse interviewFeedback(String processInfoId, Integer feedbackStatus, String time){
         if(StringUtils.isBlank(processInfoId) || feedbackStatus == null || feedbackStatus.equals("undefined")){
             return new AjaxResponse(ResponseCode.APP_FAIL,"数据不能为空！");
+        }
+        Date timeFormat = null;
+        if(time != null && time != "undefined"){
+            timeFormat = DateUtil.stringToDate(time);
         }
         //面试通过的情况
         if(feedbackStatus.equals(0)){
             //面试通过 但入职时间为空的情况
-             if(entryTime == null){
+             if(timeFormat == null){
                  return new AjaxResponse(ResponseCode.APP_FAIL,"入职时间不能为空");
              }
              //通过面试 确定入职时间  改变流程状态 获取流程表信息
@@ -155,22 +145,28 @@ public class ProcessInfoController extends BaseController {
             newProcessInfo.setStatus(2);
             newProcessInfo.setIsFeedback(0);
             newProcessInfo.setDelFlag(0);
-            newProcessInfo.setProcessContent("面试通过，" + "将于" + DateUtil.dateToString(entryTime,DateUtil.ymdFormat) + "入职");
+            newProcessInfo.setProcessContent("面试通过，" + "将于" + DateUtil.dateToString(timeFormat,DateUtil.ymdFormat) + "入职");
             newProcessInfo.setOwner(1);
             newProcessInfo.setIsInterview(1);
             newProcessInfo.setIsEntry(0);
             newProcessInfo.setIsQuit(0);
             newProcessInfo.setIsEnd(0);
             newProcessInfo.setSortNumber(processInfo.getSortNumber() + 1);
-            processInfo.setButtonA("申诉");
-            processInfo.setButtonB("已入职|未入职|修改入职时间");
+            newProcessInfo.setCreateTime(new Date());
+            //设置按钮
+            List<JSONObject> jsonA = commonService.getJsonList("A","entryFeedback",false);
+            List<JSONObject> jsonB = commonService.getJsonList("B","entryFeedback",false);
+            String strA = jsonA.toString().replace("\\","");
+            String strB = jsonB.toString().replace("\\","");
+            newProcessInfo.setButtonA(strA);
+            newProcessInfo.setButtonB(strB);
             //保存流程信息
             processInfoService.saveProcessInfo(newProcessInfo);
             processInfo.setFeedbackId(newProcessInfo.getId());
             processInfoService.saveProcessInfo(processInfo);
             //设置recevied的最新反馈
             ReceviedInfo receviedInfo = receviedInfoService.getReceviedInfoById(receviedId);
-            receviedInfo.setLatestFeedback("面试通过，" + "将于" + DateUtil.dateToString(entryTime,DateUtil.ymdFormat).trim() + "入职");
+            receviedInfo.setLatestFeedback("面试通过，" + "将于" + DateUtil.dateToString(timeFormat,DateUtil.ymdFormat).trim() + "入职");
             receviedInfoService.saveReceviedInfo(receviedInfo);
             return new AjaxResponse(ResponseCode.APP_SUCCESS);
         }else if (feedbackStatus.equals(1) || feedbackStatus.equals(2)){ //面试未到场 或者未通过的情况
@@ -203,6 +199,13 @@ public class ProcessInfoController extends BaseController {
                 receviedInfo.setLatestFeedback("面试未通过");
                 receviedInfo.setStatus(2);
             }
+            //设置A端按钮
+            List<JSONObject> jsonA = commonService.getJsonList("A","entryFeedback",false);
+            String strA = jsonA.toString().replace("\\","");
+            newProcessInfo.setButtonA(strA);
+            newProcessInfo.setCreateTime(new Date());
+            newProcessInfo.setIsFeedback(0);
+            newProcessInfo.setCreateTime(new Date());
             //首先保存流程表 原流程 新流程反馈
             processInfoService.saveProcessInfo(processInfo);
             processInfo.setFeedbackId(newProcessInfo.getId());
@@ -229,17 +232,24 @@ public class ProcessInfoController extends BaseController {
             newProcessInfo.setIsQuit(0);
             newProcessInfo.setIsEnd(0);
             newProcessInfo.setIsInterview(0);
-            newProcessInfo.setInterviewTime(interviewTime);
-            newProcessInfo.setProcessContent("修改面试时间为" + DateUtil.dateToString(interviewTime,DateUtil.ymdFormat));
+            newProcessInfo.setInterviewTime(timeFormat);
+            newProcessInfo.setProcessContent("修改面试时间为" + DateUtil.dateToString(timeFormat,DateUtil.ymdFormat));
             newProcessInfo.setSortNumber(processInfo.getSortNumber() + 1);
-            newProcessInfo.setButtonA("申诉");
-            newProcessInfo.setButtonB("面试通过|未到场|未通过");
+            newProcessInfo.setIsFeedback(0);
+            //设置按钮
+            List<JSONObject> jsonA = commonService.getJsonList("A","entryFeedback",true);
+            List<JSONObject> jsonB = commonService.getJsonList("B","interviewFeedback",true);
+            String strA = jsonA.toString().replace("\\","");
+            String strB = jsonB.toString().replace("\\","");
+            newProcessInfo.setButtonA(strA);
+            newProcessInfo.setButtonB(strB);
+            newProcessInfo.setCreateTime(new Date());
             //保存流程表
             processInfoService.saveProcessInfo(newProcessInfo);
             processInfo.setFeedbackId(newProcessInfo.getId());
             processInfoService.saveProcessInfo(processInfo);
             //保存接收简历信息
-            receviedInfo.setLatestFeedback("修改面试时间为" + DateUtil.dateToString(interviewTime,DateUtil.ymdFormat));
+            receviedInfo.setLatestFeedback("修改面试时间为" + DateUtil.dateToString(timeFormat,DateUtil.ymdFormat));
             receviedInfoService.saveReceviedInfo(receviedInfo);
             return new AjaxResponse(ResponseCode.APP_SUCCESS);
         }
@@ -257,9 +267,13 @@ public class ProcessInfoController extends BaseController {
             @ApiImplicitParam(name = "feedbackStatus",value = "反馈状态 0 已入职 1未入职 2修改入职时间",paramType = "query",required = true,dataType = "String"),
             @ApiImplicitParam(name = "enteyTime",value = "入职时间",paramType = "query",required = true,dataType = "date")})
     @ApiOperation(value = "入职反馈",notes = "根据相应状态做出相应操作")
-    public AjaxResponse entryFeedback(String processInfoId, Integer feedbackStatus,Date entryTime){
+    public AjaxResponse entryFeedback(String processInfoId, Integer feedbackStatus,String entryTime){
         if(StringUtils.isBlank(processInfoId) || feedbackStatus == null || feedbackStatus.equals("undefined")){
             return new AjaxResponse(ResponseCode.APP_FAIL,"数据有误！");
+        }
+        Date timeFormat = null;
+        if(entryTime != null && entryTime != "undefined"){
+            timeFormat = DateUtil.stringToDate(entryTime);
         }
         // 成功入职 写入入职表
         if(feedbackStatus.equals(0)){
@@ -282,9 +296,9 @@ public class ProcessInfoController extends BaseController {
             newProcessInfo.setStatus(3);
             newProcessInfo.setIsFeedback(0);
             newProcessInfo.setDelFlag(0);
-            newProcessInfo.setEntryTime(entryTime);
+            newProcessInfo.setEntryTime(timeFormat);
             //计算过保时间
-            Date overTime = DateUtil.getDateAfter(entryTime,num);
+            Date overTime = DateUtil.getDateAfter(timeFormat,num);
             newProcessInfo.setProcessContent("成功入职，将于" + DateUtil.dateToString(overTime,DateUtil.ymdFormat).trim() + "日过保" );
             newProcessInfo.setOwner(1);
             newProcessInfo.setIsInterview(1);
@@ -292,8 +306,14 @@ public class ProcessInfoController extends BaseController {
             newProcessInfo.setIsQuit(0);
             newProcessInfo.setIsEnd(0);
             newProcessInfo.setSortNumber(processInfo.getSortNumber() + 1);
-            newProcessInfo.setButtonA("申诉");
-            newProcessInfo.setButtonB("已离职");
+            //设置按钮
+            List<JSONObject> jsonA = commonService.getJsonList("A","entryFeedback",false);
+            List<JSONObject> jsonB = commonService.getJsonList("B","quitFeedback",false);
+            String strA = jsonA.toString().replace("\\","");
+            String strB = jsonB.toString().replace("\\","");
+            newProcessInfo.setButtonA(strA);
+            newProcessInfo.setButtonB(strB);
+            newProcessInfo.setCreateTime(new Date());
             //保存流程表
             processInfoService.saveProcessInfo(newProcessInfo);
             processInfo.setFeedbackId(newProcessInfo.getId());
@@ -309,11 +329,12 @@ public class ProcessInfoController extends BaseController {
             entryInfo.setJobId(jobId);
             entryInfo.setResumeId(resumeInfo.getId());
             entryInfo.setReceviedId(receviedId);
-            entryInfo.setEntryTime(entryTime);
+            entryInfo.setEntryTime(timeFormat);
             entryInfo.setOvertime(num);
             entryInfo.setOverDatetime(overTime);
             entryInfo.setDelFlag(0);
             entryInfo.setCreateTime(new Date());
+            entryInfo.setIsCash(0);
             entryInfoService.saveEntryInfo(entryInfo);
             return new AjaxResponse(ResponseCode.APP_SUCCESS);
         }else if(feedbackStatus.equals(1)){
@@ -338,6 +359,11 @@ public class ProcessInfoController extends BaseController {
             newProcessInfo.setIsQuit(0);
             newProcessInfo.setIsEnd(1);
             newProcessInfo.setSortNumber(processInfo.getSortNumber() + 1);
+            //设置A端按钮
+            List<JSONObject> jsonA = commonService.getJsonList("A","entryFeedback",false);
+            String strA = jsonA.toString().replace("\\","");
+            newProcessInfo.setButtonA(strA);
+            newProcessInfo.setCreateTime(new Date());
             // 保存流程表
             processInfoService.saveProcessInfo(newProcessInfo);
             processInfo.setFeedbackId(newProcessInfo.getId());
@@ -362,20 +388,26 @@ public class ProcessInfoController extends BaseController {
             newProcessInfo.setStatus(processInfo.getStatus());
             newProcessInfo.setIsFeedback(0);
             newProcessInfo.setDelFlag(0);
-            newProcessInfo.setProcessContent("修改入职时间为：" + DateUtil.dateToString(entryTime,DateUtil.ymdFormat) + "日");
+            newProcessInfo.setProcessContent("修改入职时间为：" + DateUtil.dateToString(timeFormat,DateUtil.ymdFormat) + "日");
             newProcessInfo.setOwner(1);
             newProcessInfo.setIsInterview(processInfo.getIsInterview());
             newProcessInfo.setIsEntry(0);
             newProcessInfo.setIsQuit(0);
             newProcessInfo.setIsEnd(0);
             newProcessInfo.setSortNumber(processInfo.getSortNumber() + 1);
-            newProcessInfo.setButtonA("申诉");
-            newProcessInfo.setButtonB("成功入职|未入职");
+            //设置按钮
+            List<JSONObject> jsonA = commonService.getJsonList("A","entryFeedback",true);
+            List<JSONObject> jsonB = commonService.getJsonList("B","entryFeedback",true);
+            String strA = jsonA.toString().replace("\\","");
+            String strB = jsonB.toString().replace("\\","");
+            newProcessInfo.setButtonA(strA);
+            newProcessInfo.setButtonB(strB);
+            newProcessInfo.setCreateTime(new Date());
             processInfoService.saveProcessInfo(newProcessInfo);
             processInfo.setFeedbackId(newProcessInfo.getId());
             processInfoService.saveProcessInfo(processInfo);
             // 更新接收简历信息
-            receviedInfo.setLatestFeedback("修改入职时间为：" + DateUtil.dateToString(entryTime,DateUtil.ymdFormat) + "日");
+            receviedInfo.setLatestFeedback("修改入职时间为：" + DateUtil.dateToString(timeFormat,DateUtil.ymdFormat) + "日");
             receviedInfo.setStatus(0);
             return new AjaxResponse(ResponseCode.APP_SUCCESS);
         }
@@ -392,9 +424,13 @@ public class ProcessInfoController extends BaseController {
     @ApiImplicitParams({@ApiImplicitParam(name = "processInfoId",value = "流程id",paramType = "query",required = true,dataType = "String"),
             @ApiImplicitParam(name = "quitTime",value = "离职时间",paramType = "query",required = true,dataType = "date")})
     @ApiOperation(value = "离职反馈",notes = "根据相应状态做出相应操作")
-    public AjaxResponse quitFeedback(String processInfoId,Date quitTime){
+    public AjaxResponse quitFeedback(String processInfoId,String quitTime){
         if(StringUtils.isBlank(processInfoId)){
             return new AjaxResponse(ResponseCode.APP_FAIL,"id不能为空！");
+        }
+        Date timeFormat = null;
+        if(quitTime != null && quitTime != "undefined"){
+            timeFormat = DateUtil.stringToDate(quitTime);
         }
         ProcessInfo processInfo = processInfoService.getProcessInfoById(processInfoId);
         processInfo.setIsFeedback(1);
@@ -409,21 +445,157 @@ public class ProcessInfoController extends BaseController {
         newProcessInfo.setStatus(processInfo.getStatus() + 1);
         newProcessInfo.setIsFeedback(0);
         newProcessInfo.setDelFlag(0);
-        newProcessInfo.setProcessContent("已于：" + DateUtil.dateToString(quitTime,DateUtil.ymdFormat) + "日离职");
+        newProcessInfo.setProcessContent("已于：" + DateUtil.dateToString(timeFormat,DateUtil.ymdFormat) + "日离职");
         newProcessInfo.setOwner(1);
         newProcessInfo.setIsInterview(processInfo.getIsInterview());
         newProcessInfo.setIsEntry(processInfo.getIsEntry());
         newProcessInfo.setIsQuit(1);
         newProcessInfo.setIsEnd(1);
         newProcessInfo.setSortNumber(processInfo.getSortNumber() + 1);
+        //设置按钮
+        List<JSONObject> jsonA = commonService.getJsonList("A","quitFeedback",false);
+        String strA = jsonA.toString().replace("\\","");
+        newProcessInfo.setButtonA(strA);
+        newProcessInfo.setCreateTime(new Date());
         // 保存流程表
         processInfoService.saveProcessInfo(newProcessInfo);
         processInfo.setFeedbackId(newProcessInfo.getId());
         processInfoService.saveProcessInfo(processInfo);
         //保存接收简历表
-        receviedInfo.setLatestFeedback("已于：" + DateUtil.dateToString(quitTime,DateUtil.ymdFormat).trim() + "日离职");
+        receviedInfo.setLatestFeedback("已于：" + DateUtil.dateToString(timeFormat,DateUtil.ymdFormat).trim() + "日离职");
         return new AjaxResponse(ResponseCode.APP_SUCCESS);
     }
+
+    /* *
+     * A端 已知悉
+     * @author zhaoMaoJie
+     * @date 2019/8/7 0007
+     */
+    @RequestMapping(value = "/isKnow",method = RequestMethod.POST)
+    @ResponseBody
+    public AjaxResponse isKnow(String processInfoId){
+        ProcessInfo processInfo = processInfoService.getProcessInfoById(processInfoId);
+        ProcessInfo newProcessInfo = new ProcessInfo();
+        newProcessInfo.setReceviedId(processInfo.getReceviedId());
+        newProcessInfo.setbUserId(processInfo.getbUserId());
+        newProcessInfo.setaUserId(processInfo.getaUserId());
+        newProcessInfo.setStatus(processInfo.getStatus());
+        newProcessInfo.setDelFlag(0);
+        newProcessInfo.setProcessContent("已知晓，谢谢");
+        newProcessInfo.setOwner(0);
+        newProcessInfo.setIsInterview(processInfo.getIsInterview());
+        newProcessInfo.setIsEntry(processInfo.getIsEntry());
+        newProcessInfo.setInterviewTime(processInfo.getInterviewTime());
+        newProcessInfo.setEntryTime(processInfo.getEntryTime());
+        newProcessInfo.setIsQuit(processInfo.getIsQuit());
+        newProcessInfo.setQuitTime(processInfo.getQuitTime());
+        newProcessInfo.setIsEnd(processInfo.getIsEnd());
+        newProcessInfo.setSortNumber(processInfo.getSortNumber() + 1);
+        newProcessInfo.setCreateTime(new Date());
+        newProcessInfo.setIsFeedback(0);
+//        newProcessInfo.setButtonA(processInfo.getButtonA());
+        newProcessInfo.setButtonB(processInfo.getButtonB());
+        processInfoService.saveProcessInfo(newProcessInfo);
+        processInfo.setIsFeedback(1);
+        processInfo.setFeedbackId(newProcessInfo.getId());
+        processInfoService.saveProcessInfo(processInfo);
+        return new AjaxResponse(ResponseCode.APP_SUCCESS);
+    }
+
+    /* *
+     * A端 申诉
+     * @author zhaoMaoJie
+     * @date 2019/8/7 0007
+     */
+    @RequestMapping(value = "/appeal",method = RequestMethod.POST)
+    @ResponseBody
+    public AjaxResponse appeal(String processInfoId,String content){
+        ProcessInfo processInfo = processInfoService.getProcessInfoById(processInfoId);
+        ProcessInfo newProcessInfo = new ProcessInfo();
+        processInfo.setIsFeedback(1);
+        newProcessInfo.setReceviedId(processInfo.getReceviedId());
+        newProcessInfo.setbUserId(processInfo.getbUserId());
+        newProcessInfo.setaUserId(processInfo.getaUserId());
+        newProcessInfo.setStatus(processInfo.getStatus());
+        newProcessInfo.setDelFlag(0);
+        newProcessInfo.setProcessContent(content);
+        newProcessInfo.setOwner(0);
+        newProcessInfo.setIsInterview(processInfo.getIsInterview());
+        newProcessInfo.setIsEntry(processInfo.getIsEntry());
+        newProcessInfo.setInterviewTime(processInfo.getInterviewTime());
+        newProcessInfo.setEntryTime(processInfo.getEntryTime());
+        newProcessInfo.setIsQuit(processInfo.getIsQuit());
+        newProcessInfo.setQuitTime(processInfo.getQuitTime());
+        newProcessInfo.setIsEnd(processInfo.getIsEnd());
+        newProcessInfo.setCreateTime(new Date());
+        newProcessInfo.setIsFeedback(0);
+        //设置按钮
+        List<JSONObject> jsonB = commonService.getJsonList("B","appeal",false);
+        String strB = jsonB.toString().replace("\\","");
+        newProcessInfo.setButtonB(strB);
+        newProcessInfo.setSortNumber(processInfo.getSortNumber() + 1);
+        newProcessInfo.setCreateTime(new Date());
+        processInfoService.saveProcessInfo(newProcessInfo);
+        processInfo.setFeedbackId(newProcessInfo.getId());
+        processInfoService.saveProcessInfo(processInfo);
+        return new AjaxResponse(ResponseCode.APP_SUCCESS);
+    }
+
+    /* *
+     * A端 认可
+     * @author zhaoMaoJie
+     * @date 2019/8/7 0007
+     */
+    @RequestMapping(value = "/approval",method = RequestMethod.POST)
+    @ResponseBody
+    public AjaxResponse approval(String processInfoId){
+        ProcessInfo processInfo = processInfoService.getProcessInfoById(processInfoId);
+        ProcessInfo newProcessInfo = new ProcessInfo();
+        newProcessInfo.setReceviedId(processInfo.getReceviedId());
+        newProcessInfo.setbUserId(processInfo.getbUserId());
+        newProcessInfo.setaUserId(processInfo.getaUserId());
+        newProcessInfo.setStatus(processInfo.getStatus());
+        newProcessInfo.setDelFlag(0);
+        newProcessInfo.setProcessContent("认可");
+        newProcessInfo.setOwner(0);
+        newProcessInfo.setIsInterview(processInfo.getIsInterview());
+        newProcessInfo.setIsEntry(processInfo.getIsEntry());
+        newProcessInfo.setInterviewTime(processInfo.getInterviewTime());
+        newProcessInfo.setEntryTime(processInfo.getEntryTime());
+        newProcessInfo.setIsQuit(processInfo.getIsQuit());
+        newProcessInfo.setQuitTime(processInfo.getQuitTime());
+        newProcessInfo.setIsEnd(processInfo.getIsEnd());
+        //设置按钮
+        List<JSONObject> jsonB = new ArrayList();
+        Integer status = processInfo.getStatus();
+        if(status != null && status == 1){
+            jsonB = commonService.getJsonList("B","interviewFeedback",false);
+        }else if(status != null && status == 2){
+            jsonB = commonService.getJsonList("B","entryFeedback",false);
+        }else if(status != null && status == 3){
+            jsonB = commonService.getJsonList("B","quitFeedback",false);
+        }
+        String strB = jsonB.toString().replace("\\","");
+        newProcessInfo.setButtonB(strB);
+        newProcessInfo.setCreateTime(new Date());
+        newProcessInfo.setSortNumber(processInfo.getSortNumber() + 1);
+        newProcessInfo.setIsFeedback(0);
+        newProcessInfo.setCreateTime(new Date());
+        processInfoService.saveProcessInfo(newProcessInfo);
+        processInfo.setIsFeedback(1);
+        processInfo.setFeedbackId(newProcessInfo.getId());
+        processInfoService.saveProcessInfo(processInfo);
+        return new AjaxResponse(ResponseCode.APP_SUCCESS);
+    }
+
+    //向平台申诉
+
+
+
+
+
+
+
 
 
 }

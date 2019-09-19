@@ -26,6 +26,16 @@ public class DateUtil {
         return dateString;
     }
 
+    public static Date stringToDate(String datStr)  {
+        Date date = null;
+        try {
+            date = ymdFormat.parse(datStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
+
     /* *
      * 计算时间差值
      * @author zhaoMaoJie

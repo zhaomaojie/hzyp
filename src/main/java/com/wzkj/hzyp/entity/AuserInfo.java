@@ -60,6 +60,13 @@ public class AuserInfo implements java.io.Serializable{
     @Column(name = "OPEN_ID")
     private String openId;
 
+    /** 性别 */
+    @Column(name = "GENDER")
+    private Integer gender;
+
+    /** 性别 */
+    private String avatar;
+
     public String getId() {
         return id;
     }
@@ -146,5 +153,21 @@ public class AuserInfo implements java.io.Serializable{
 
     public void setOpenId(String openId) {
         this.openId = openId;
+    }
+
+    public Integer getGender() {
+        return gender;
+    }
+
+    public void setGender(Integer gender) {
+        this.gender = gender;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }

@@ -123,5 +123,12 @@ public interface AUserService {
      * @author zhaoMaoJie
      * @date 2019/9/9 0009
      */
-    void cashout(String aUserId);
+    boolean cashout(String aUserId);
+
+    /* *
+     * 获取提现历史信息
+     * @author zhaoMaoJie
+     * @date 2019/9/11 0011
+     */
+    List<CashOutListVO> getCashoutHistary(String aUserId);
 }

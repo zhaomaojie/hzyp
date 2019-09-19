@@ -126,6 +126,10 @@ public class JobInfo implements java.io.Serializable{
     @Column(name = "LABEL")
     private Integer label;
 
+    /** 是否支付履约金 0未支付 1已支付 */
+    @Column(name = "IS_PAY")
+    private Integer isPay;
+
     public String getId() {
         return id;
     }
@@ -343,5 +347,13 @@ public class JobInfo implements java.io.Serializable{
 
     public void setAgeMax(Integer ageMax) {
         this.ageMax = ageMax;
+    }
+
+    public Integer getIsPay() {
+        return isPay;
+    }
+
+    public void setIsPay(Integer isPay) {
+        this.isPay = isPay;
     }
 }

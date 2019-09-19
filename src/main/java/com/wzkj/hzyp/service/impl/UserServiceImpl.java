@@ -29,7 +29,6 @@ import java.util.Map;
  * @date {DATE}
  */
 @Service
-@Transactional
 public class UserServiceImpl implements AUserService {
 
     @Autowired
@@ -173,9 +172,21 @@ public class UserServiceImpl implements AUserService {
     }
 
     @Override
-    public void cashout(String aUserId) {
-        mapper.cashout(aUserId);
-        mapper.updateEntryInfoIsCash(aUserId);
+    @Transactional(rollbackFor = Exception.class)
+    public boolean cashout(String aUserId) {
+        Integer num = mapper.cashout(aUserId);
+        Integer number = mapper.updateEntryInfoIsCash(aUserId);
+        if(num != null && number != null){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    @Override
+    public List<CashOutListVO> getCashoutHistary(String aUserId) {
+        List<CashOutListVO> list = mapper.getCashoutHistary(aUserId);
+        return list;
     }
 
 

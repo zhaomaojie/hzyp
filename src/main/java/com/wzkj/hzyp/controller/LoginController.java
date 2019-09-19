@@ -52,6 +52,9 @@ public class LoginController extends BaseController {
     @Autowired
     private AliyunSMSService aliyunSMSService;
 
+    @Autowired
+    private ImageConfig imageConfig;
+
 
     @Value("${project.weixin.mp_app_id}")
     private String appid;
@@ -237,10 +240,22 @@ public class LoginController extends BaseController {
     @ApiImplicitParams({@ApiImplicitParam(name = "name",value = "姓名",paramType = "query",required = true,dataType = "string"),
             @ApiImplicitParam(name = "age",value = "年龄",paramType = "query",required = true,dataType = "integer")})
     @ApiOperation(value = "更改用户信息",notes = "当用户通过验证码注册时使用，或更改用户信息时")
-    public AjaxResponse updateUser(Integer age,String name){
+    public AjaxResponse updateUser(Integer age,String name,Integer gender,String avatar){
         AuserInfo aUserInfo = getLoginUser();
+        //注册页面 首先判断验证码是否正确 是否超时
         aUserInfo.setAge(age);
         aUserInfo.setName(name);
+        aUserInfo.setGender(gender);
+        if(StringUtils.isNotBlank(avatar)){
+            aUserInfo.setAvatar(avatar);
+        }else {
+            //如果没有主动上传 那么根据性别设置一个默认的图片 男士头像
+            if(gender == 0){
+                aUserInfo.setAvatar(imageConfig.getManAvatarForA());
+            }else {
+                aUserInfo.setAvatar(imageConfig.getWomanAvatarForA());
+            }
+        }
         aUserInfo.setLastLoginTime(new Date());
         aUserService.updateUserInfo(aUserInfo);
         String id = aUserInfo.getId();

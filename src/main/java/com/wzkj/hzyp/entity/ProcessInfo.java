@@ -1,12 +1,20 @@
 package com.wzkj.hzyp.entity;
 
+import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.google.gson.JsonObject;
+import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
+@TypeDef(name = "json", typeClass = JsonStringType.class)
 @Table(name = "B_PROCESS_INFO")
 public class ProcessInfo {
 
@@ -93,10 +101,23 @@ public class ProcessInfo {
     private Integer sortNumber;
 
     /** A端按钮 */
+//    @Type( type = "json" )
+//    @Column( name = "button_a",columnDefinition = "json" )
+//    private List<JSONObject> buttonA;
+
+    @Column(name = "button_a")
     private String buttonA;
 
     /** B端按钮 */
+//    @Type(type = "json")
+//    @Column(name = "button_b",columnDefinition = "json")
+//    private List<JSONObject> buttonB;
+    @Column(name = "button_b")
     private String buttonB;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "CREATE_TIME")
+    private Date createTime;
 
     public String getId() {
         return id;
@@ -264,5 +285,13 @@ public class ProcessInfo {
 
     public void setButtonB(String buttonB) {
         this.buttonB = buttonB;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 }

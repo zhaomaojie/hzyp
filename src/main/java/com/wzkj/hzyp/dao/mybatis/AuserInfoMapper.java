@@ -77,17 +77,17 @@ public interface AuserInfoMapper {
      * @author zhaoMaoJie
      * @date 2019/9/9 0009
      */
-    void updateEntryInfoIsCash(@Param("aUserId") String aUserId);
+    Integer updateEntryInfoIsCash(@Param("aUserId") String aUserId);
+
+    /* *
+     * 获取提现历史信息
+     * @author zhaoMaoJie
+     * @date 2019/9/11 0011
+     */
+    List<CashOutListVO> getCashoutHistary(@Param("aUserId") String aUserId);
 
     int deleteByPrimaryKey(String id);
 
-    int insert(AuserInfo record);
-
-    int insertSelective(AuserInfo record);
-
     AuserInfo selectByPrimaryKey(String id);
 
-    int updateByPrimaryKeySelective(AuserInfo record);
-
-    int updateByPrimaryKey(AuserInfo record);
 }

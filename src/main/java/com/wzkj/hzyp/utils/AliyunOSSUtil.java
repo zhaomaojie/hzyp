@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.UUID;
 
 /* *
- * 阿里鱼上传文件工具类
+ * 阿里云上传文件工具类
  * @author zhaoMaoJie
  * @date 2019/8/9 0009
  */

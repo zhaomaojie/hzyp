@@ -7,6 +7,7 @@ import com.wzkj.hzyp.entity.StoreInfo;
 import com.wzkj.hzyp.service.StoreInfoService;
 import com.wzkj.hzyp.utils.AliyunOSSUtil;
 import com.wzkj.hzyp.utils.FileUtil;
+import com.wzkj.hzyp.utils.ImageConfig;
 import com.wzkj.hzyp.utils.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -40,6 +41,9 @@ public class StoreInfoController extends BaseController {
     @Autowired
     private AliyunOSSUtil aliyunOSSUtil;
 
+    @Autowired
+    private ImageConfig imageConfig;
+
     @RequestMapping(value = "/saveStore",method = RequestMethod.POST)
     @ResponseBody
     @ApiImplicitParams({@ApiImplicitParam(name = "id",value = "商户id",paramType = "query",required = true,dataType = "String"),
@@ -54,7 +58,7 @@ public class StoreInfoController extends BaseController {
             @ApiImplicitParam(name = "phone",value = "联系人电话",paramType = "query",required = true,dataType = "String")
             })
     @ApiOperation(value = "商户注册/修改",notes = "注册或修改商户时使用")
-    public AjaxResponse saveStore(String id,String name,String cityCode,String address,String industryCode,
+    public AjaxResponse saveStore(String id,String name,String cityCode,String address,String industryCode,String avatar,
                                   String contactName,String businessImg,String companyImg,String logo,String phone){
         //id为空 表示 新增商户
         if(StringUtils.isBlank(id)){
@@ -74,6 +78,11 @@ public class StoreInfoController extends BaseController {
             storeInfo.setDelFlag(0);
             String userId = getBuser().getId();
             storeInfo.setbUserId(userId);
+            if(StringUtils.isNotBlank(avatar)){
+                storeInfo.setAvatar(avatar);
+            }else {
+                storeInfo.setAvatar(imageConfig.getManAvatarForB());
+            }
             storeInfoService.saveStoreInfo(storeInfo);
             Map map = new HashMap();
             map.put("id",storeInfo.getId());
@@ -94,6 +103,11 @@ public class StoreInfoController extends BaseController {
             storeInfo.setDelFlag(0);
             String userId = getBuser().getId();
             storeInfo.setbUserId(userId);
+            if(StringUtils.isNotBlank(avatar)){
+                storeInfo.setAvatar(avatar);
+            }else {
+                storeInfo.setAvatar(imageConfig.getManAvatarForB());
+            }
             storeInfoService.saveStoreInfo(storeInfo);
             Map map = new HashMap();
             map.put("id",storeInfo.getId());

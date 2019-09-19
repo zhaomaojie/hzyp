@@ -14,6 +14,15 @@
     <result column="verdify_code_time" property="verdifyCodeTime" jdbcType="TIMESTAMP" />
     <result column="open_id" property="openId" jdbcType="VARCHAR" />
   </resultMap>
+
+  <resultMap id="CashOutListVO" type="com.wzkj.hzyp.vo.CashOutListVO">
+    <result column="jobName" property="jobName" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="reward" property="reward" jdbcType="VARCHAR" />
+    <result column="entryTime" property="entryTime" jdbcType="TIMESTAMP" />
+    <result column="overTime" property="overTime" jdbcType="TIMESTAMP" />
+    <result column="cashoutTime" property="cashoutTime" jdbcType="TIMESTAMP" />
+  </resultMap>
   <sql id="Base_Column_List" >
     id, name, age, empower_phone, verify_code, create_time, update_time, last_login_time, 
     del_flag, verdify_code_time,open_id
@@ -29,7 +38,7 @@
 	<if test="bUserId != null and bUserId != ''">
       AND a.b_user_id = #{bUserId}
     </if>
-    AND a.del_flag = 0
+    AND  a.is_pay = 1
   </select>
 
   <select id="getJobNum" resultType="java.lang.Integer">
@@ -65,6 +74,28 @@
       WHERE a.b_user_id = #{bUserId}
     </if>
     </select>
+
+  <select id="getCashoutDetail" resultMap="CashOutListVO">
+    SELECT
+    b.job_name jobName,
+    b.reward,
+    c.name,
+    a.cashoutTime cashoutTime
+    FROM
+    c_entry_info a
+    INNER JOIN b_job_info b ON a.job_id = b.id
+    LEFT JOIN c_resume_info c ON a.resume_id = c.id
+    WHERE
+    1 = 1
+    <if test="bUserId != null and bUserId !=''">
+      AND a.b_user_Id = #{bUserId}
+    </if>
+    <![CDATA[ AND a.over_datetime < NOW() ]]>
+    AND a.is_cash = 1
+    ORDER BY a.over_datetime DESC
+  </select>
+
+
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />

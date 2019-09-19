@@ -13,6 +13,8 @@
     <result column="verify_code" property="verifyCode" jdbcType="VARCHAR" />
     <result column="verdify_code_time" property="verdifyCodeTime" jdbcType="TIMESTAMP" />
     <result column="open_id" property="openId" jdbcType="VARCHAR" />
+    <result column="gender" property="gender" jdbcType="INTEGER" />
+    <result column="avatar" property="avatar" jdbcType="VARCHAR" />
   </resultMap>
 
   <resultMap id="CashOutListVO" type="com.wzkj.hzyp.vo.CashOutListVO">
@@ -20,10 +22,12 @@
     <result column="name" property="name" jdbcType="VARCHAR" />
     <result column="reward" property="reward" jdbcType="VARCHAR" />
     <result column="entryTime" property="entryTime" jdbcType="TIMESTAMP" />
+    <result column="overTime" property="overTime" jdbcType="TIMESTAMP" />
+    <result column="cashoutTime" property="cashoutTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, age, create_time, del_flag, empower_phone, last_login_time, name, update_time, 
-    verify_code, verdify_code_time,open_id
+    verify_code, verdify_code_time,open_id,gender,avatar
   </sql>
 
   <select id="getRecommenNumber" resultType="java.lang.Integer" >
@@ -59,7 +63,7 @@
     INNER JOIN b_job_info b ON a.job_id = b.id
     WHERE 1 = 1
     AND a.is_cash = 0
-    AND a.over_datetime > TO_DAYS(NOW())
+    <![CDATA[ AND a.over_datetime < NOW() ]]>
     <if test="aUserId != null and aUserId != ''">
       AND a.a_user_id = #{aUserId}
     </if>
@@ -67,14 +71,26 @@
 
   <select id="getTotalMoney" resultType="java.lang.Integer">
     SELECT
-	sum(a.amount_money)
+    sum(b.reward)
     FROM
-	a_cashout_info a
-    WHERE
-	1 = 1
+    c_entry_info a
+    INNER JOIN b_job_info b ON a.job_id = b.id
+    WHERE 1 = 1
+    AND a.is_cash = 1
+    <![CDATA[ AND a.over_datetime < NOW() ]]>
     <if test="aUserId != null and aUserId != ''">
       AND a.a_user_id = #{aUserId}
     </if>
+
+    <!--SELECT-->
+	<!--sum(a.amount_money)-->
+    <!--FROM-->
+	<!--a_cashout_info a-->
+    <!--WHERE-->
+	<!--1 = 1-->
+    <!--<if test="aUserId != null and aUserId != ''">-->
+      <!--AND a.a_user_id = #{aUserId}-->
+    <!--</if>-->
   </select>
 
   <select id="getChangeJobInfo" resultType="java.util.HashMap">
@@ -111,7 +127,7 @@
     b.job_name jobName,
     b.reward,
     c.name,
-    a.entry_time entryTime
+    a.over_datetime overTime
     FROM
     c_entry_info a
     INNER JOIN b_job_info b ON a.job_id = b.id
@@ -120,10 +136,30 @@
     1 = 1
     <if test="aUserId != null and aUserId !=''">
       AND a.a_user_Id = #{aUserId}
-      AND  NOW() > a.over_datetime
-      AND a.is_cash = 0
     </if>
-    ORDER BY a.entry_time DESC
+    <![CDATA[ AND a.over_datetime < NOW() ]]>
+    AND a.is_cash = 0
+    ORDER BY a.over_datetime DESC
+  </select>
+
+  <select id="getCashoutHistary" resultMap="CashOutListVO">
+    SELECT
+    b.job_name jobName,
+    b.reward,
+    c.name,
+    a.cashoutTime cashoutTime
+    FROM
+    c_entry_info a
+    INNER JOIN b_job_info b ON a.job_id = b.id
+    LEFT JOIN c_resume_info c ON a.resume_id = c.id
+    WHERE
+    1 = 1
+    <if test="aUserId != null and aUserId !=''">
+      AND a.a_user_Id = #{aUserId}
+    </if>
+    <![CDATA[ AND a.over_datetime < NOW() ]]>
+    AND a.is_cash = 1
+    ORDER BY a.over_datetime DESC
   </select>
 
 <update id="cashout" >
@@ -148,8 +184,9 @@
   ) x ON b.id = x.jobId
   SET b.total_amount = b.total_amount - x.money
 </update>
-  <update id="ss">
-    update 	c_entry_info a SET a.is_cash = 1 WHERE a.id in (SELECT id FROM(
+  <update id="updateEntryInfoIsCash">
+
+    update 	c_entry_info a SET a.is_cash = 1, <![CDATA[ a.cashoutTime = NOW() ]]> WHERE a.id in (SELECT id FROM(
     SELECT
     a.id
     FROM
@@ -175,134 +212,5 @@
     delete from a_user_info
     where id = #{id,jdbcType=VARCHAR}
   </delete>
-  <insert id="insert" parameterType="com.wzkj.hzyp.entity.AuserInfo" >
-    insert into a_user_info (id, age, create_time, 
-      del_flag, empower_phone, last_login_time, 
-      name, update_time, verify_code, 
-      verdify_code_time,open_id)
-    values (#{id,jdbcType=VARCHAR}, #{age,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{delFlag,jdbcType=INTEGER}, #{empowerPhone,jdbcType=VARCHAR}, #{lastLoginTime,jdbcType=TIMESTAMP}, 
-      #{name,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{verifyCode,jdbcType=VARCHAR}, 
-      #{verdifyCodeTime,jdbcType=TIMESTAMP}, #{openId,jdbcType=VARCHAR})
-  </insert>
-  <insert id="insertSelective" parameterType="com.wzkj.hzyp.entity.AuserInfo" >
-    insert into a_user_info
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        id,
-      </if>
-      <if test="age != null" >
-        age,
-      </if>
-      <if test="createTime != null" >
-        create_time,
-      </if>
-      <if test="delFlag != null" >
-        del_flag,
-      </if>
-      <if test="empowerPhone != null" >
-        empower_phone,
-      </if>
-      <if test="lastLoginTime != null" >
-        last_login_time,
-      </if>
-      <if test="name != null" >
-        name,
-      </if>
-      <if test="updateTime != null" >
-        update_time,
-      </if>
-      <if test="verifyCode != null" >
-        verify_code,
-      </if>
-      <if test="verdifyCodeTime != null" >
-        verdify_code_time,
-      </if>
-      <if test="openId != null" >
-        open_id,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        #{id,jdbcType=VARCHAR},
-      </if>
-      <if test="age != null" >
-        #{age,jdbcType=INTEGER},
-      </if>
-      <if test="createTime != null" >
-        #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="delFlag != null" >
-        #{delFlag,jdbcType=INTEGER},
-      </if>
-      <if test="empowerPhone != null" >
-        #{empowerPhone,jdbcType=VARCHAR},
-      </if>
-      <if test="lastLoginTime != null" >
-        #{lastLoginTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="name != null" >
-        #{name,jdbcType=VARCHAR},
-      </if>
-      <if test="updateTime != null" >
-        #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="verifyCode != null" >
-        #{verifyCode,jdbcType=VARCHAR},
-      </if>
-      <if test="verdifyCodeTime != null" >
-        #{verdifyCodeTime,jdbcType=TIMESTAMP},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.wzkj.hzyp.entity.AuserInfo" >
-    update a_user_info
-    <set >
-      <if test="age != null" >
-        age = #{age,jdbcType=INTEGER},
-      </if>
-      <if test="createTime != null" >
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="delFlag != null" >
-        del_flag = #{delFlag,jdbcType=INTEGER},
-      </if>
-      <if test="empowerPhone != null" >
-        empower_phone = #{empowerPhone,jdbcType=VARCHAR},
-      </if>
-      <if test="lastLoginTime != null" >
-        last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="name != null" >
-        name = #{name,jdbcType=VARCHAR},
-      </if>
-      <if test="updateTime != null" >
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="verifyCode != null" >
-        verify_code = #{verifyCode,jdbcType=VARCHAR},
-      </if>
-      <if test="verdifyCodeTime != null" >
-        verdify_code_time = #{verdifyCodeTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="openId != null" >
-        open_id = #{openId,jdbcType=TIMESTAMP},
-      </if>
-    </set>
-    where id = #{id,jdbcType=VARCHAR}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.wzkj.hzyp.entity.AuserInfo" >
-    update a_user_info
-    set age = #{age,jdbcType=INTEGER},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      del_flag = #{delFlag,jdbcType=INTEGER},
-      empower_phone = #{empowerPhone,jdbcType=VARCHAR},
-      last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
-      name = #{name,jdbcType=VARCHAR},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      verify_code = #{verifyCode,jdbcType=VARCHAR},
-      verdify_code_time = #{verdifyCodeTime,jdbcType=TIMESTAMP},
-      open_id = #{openId,jdbcType=VARCHAR},
-    where id = #{id,jdbcType=VARCHAR}
-  </update>
+
 </mapper>

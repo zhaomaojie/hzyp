@@ -17,7 +17,10 @@ public class CashOutListVO {
     private Integer reward;
 
     @JsonFormat(pattern="yyyy-MM-dd ",timezone = "GMT+8")
-    private Date entryTime;
+    private Date overTime;
+
+    @JsonFormat(pattern="yyyy-MM-dd ",timezone = "GMT+8")
+    private Date cashoutTime;
 
     public String getJobName() {
         return jobName;
@@ -43,11 +46,19 @@ public class CashOutListVO {
         this.reward = reward;
     }
 
-    public Date getEntryTime() {
-        return entryTime;
+    public Date getOverTime() {
+        return overTime;
     }
 
-    public void setEntryTime(Date entryTime) {
-        this.entryTime = entryTime;
+    public void setOverTime(Date overTime) {
+        this.overTime = overTime;
+    }
+
+    public Date getCashoutTime() {
+        return cashoutTime;
+    }
+
+    public void setCashoutTime(Date cashoutTime) {
+        this.cashoutTime = cashoutTime;
     }
 }

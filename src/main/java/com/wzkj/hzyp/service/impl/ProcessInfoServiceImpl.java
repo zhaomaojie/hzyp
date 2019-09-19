@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @user zhaoMaoJie
@@ -34,7 +35,10 @@ public class ProcessInfoServiceImpl implements ProcessInfoService {
 
     @Override
     public ProcessInfo getProcessInfoById(String id) {
+        ProcessInfo processInfo1 = processInfoRepository.getOne(id);
+        Optional<ProcessInfo> processInfo2 = processInfoRepository.findById(id);
         ProcessInfo processInfo = processInfoMapper.selectByPrimaryKey(id);
+
         return processInfo;
     }
 

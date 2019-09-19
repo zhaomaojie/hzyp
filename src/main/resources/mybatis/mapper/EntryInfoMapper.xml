@@ -14,10 +14,11 @@
     <result column="del_flag" property="delFlag" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="is_cash" property="isCash" jdbcType="INTEGER" />
+    <result column="cashoutTime" property="cashoutTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, a_user_id, b_user_id, job_id, resume_id, recevied_id, entry_time, overtime, over_datetime, 
-    del_flag, create_time, is_cash
+    del_flag, create_time, is_cash,cashoutTime
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -33,12 +34,13 @@
     insert into c_entry_info (id, a_user_id, b_user_id, 
       job_id, resume_id, recevied_id, 
       entry_time, overtime, over_datetime, 
-      del_flag, create_time, is_cash
+      del_flag, create_time, is_cash,cashoutTime
       )
     values (#{id,jdbcType=VARCHAR}, #{aUserId,jdbcType=VARCHAR}, #{bUserId,jdbcType=VARCHAR}, 
       #{jobId,jdbcType=VARCHAR}, #{resumeId,jdbcType=VARCHAR}, #{receviedId,jdbcType=VARCHAR}, 
       #{entryTime,jdbcType=TIMESTAMP}, #{overtime,jdbcType=INTEGER}, #{overDatetime,jdbcType=TIMESTAMP}, 
-      #{delFlag,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{isCash,jdbcType=INTEGER}
+      #{delFlag,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{isCash,jdbcType=INTEGER},
+      #{cashoutTime,jdbcType=TIMESTAMP}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.wzkj.hzyp.entity.EntryInfo" >
@@ -80,6 +82,10 @@
       <if test="isCash != null" >
         is_cash,
       </if>
+      <if test="isCash != null" >
+        cashoutTime,
+      </if>
+
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -117,6 +123,9 @@
       </if>
       <if test="isCash != null" >
         #{isCash,jdbcType=INTEGER},
+      </if>
+      <if test="cashoutTime != null">
+        #{cashoutTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -156,6 +165,9 @@
       <if test="isCash != null" >
         is_cash = #{isCash,jdbcType=INTEGER},
       </if>
+      <if test="cashoutTime != null" >
+        cashoutTime = #{cashoutTime,jdbcType=TIMESTAMP},
+      </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -172,6 +184,7 @@
       del_flag = #{delFlag,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       is_cash = #{isCash,jdbcType=INTEGER}
+      cashoutTime = #{cashoutTime,jdbcType=TIMESTAMP},
     where id = #{id,jdbcType=VARCHAR}
   </update>
 </mapper>

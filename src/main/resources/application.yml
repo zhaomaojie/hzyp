@@ -11,7 +11,7 @@ spring:
   profiles:
     active: local
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/hzyp?serverTimezone=GMT%2b8&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useOldAliasMetadataBehavior=true
+    url: jdbc:mysql://127.0.0.1:3306/hzyp?serverTimezone=GMT%2b8&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useOldAliasMetadataBehavior=true&useAffectedRows=true
     username: root
     password: root
     driver-class-name: com.mysql.jdbc.Driver
@@ -107,6 +107,85 @@ project:
     pushResumeTemplate: TS3G8FWhMVvtvX1wxg25yJmD0mkvA8JEj9W3WyPDnZY
     #B端进入小程序的页面 接收新简历 待定
     pushResumeJumpPages: pages/customer/main/main
+
+## 设置AB端的默认图片
+  image:
+    terminanA:
+      man: https://sypupload.oss-cn-hangzhou.aliyuncs.com/avatar/defaultImage/manA.png
+      woman: https://sypupload.oss-cn-hangzhou.aliyuncs.com/avatar/defaultImage/womanA.png
+    terminalB:
+      man: https://sypupload.oss-cn-hangzhou.aliyuncs.com/avatar/defaultImage/terminalB.png
+      woman:
+    resume:
+      man: https://sypupload.oss-cn-hangzhou.aliyuncs.com/avatar/defaultImage/resumeMan.png
+      woman: https://sypupload.oss-cn-hangzhou.aliyuncs.com/avatar/defaultImage/resumeWoman.png
+
+
+  process:
+    smsTemplate:
+      text: 复制文本
+      method: copyText
+    interviewFeedback:
+      terminalA:
+        text: 取消面试
+        method: cancelResume
+      terminalB:
+        default:
+          text: 面试通过
+          method: interviewFeedback
+        notArrived:
+          text: 未到场
+          method: interviewFeedback
+        fail:
+          text: 未通过
+          method: interviewFeedback
+        updateTime:
+          text: 修改时间
+          method: interviewFeedback
+
+    entryFeedback:
+      terminalA:
+        default:
+          text: 已知晓
+          method: entryFeedback
+        appeal:
+          text: 申诉
+          method: appeal
+      terminalB:
+        success:
+          text: 已入职
+          method: entryFeedback
+        fail:
+          text: 未入职
+          method: entryFeedback
+        updateTime:
+          text: 修改入职时间
+          method: entryFeedback
+    quitFeedback:
+      terminalA:
+        default:
+          text: 已知晓
+          method: isKonw
+        appeal:
+          text: 申诉
+          method: appeal
+      terminalB:
+        default:
+          text: 已离职
+          method: quitFeedback
+    appealfeedback:
+      terminalA:
+        default:
+          text: 认可
+          method: approval
+        notRecognized:
+          text: 向平台申诉
+          method: xx
+
+
+
+
+
 
 
 
