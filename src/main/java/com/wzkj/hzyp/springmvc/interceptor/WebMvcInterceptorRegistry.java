@@ -29,6 +29,7 @@ public class WebMvcInterceptorRegistry implements WebMvcConfigurer {
                 .excludePathPatterns("/store/getImageWebUrl")
                 .excludePathPatterns("/store/bindStoreCompanyImg")
                 .excludePathPatterns("/store/bindStoreLogo")
+                .excludePathPatterns("/user/uploadAvatar")
                 //放行swagger相关文件
                 .excludePathPatterns("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**");
     }

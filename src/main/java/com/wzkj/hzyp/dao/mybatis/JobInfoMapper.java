@@ -40,15 +40,6 @@ public interface JobInfoMapper {
      */
     List<JobInfoVO> publishJobList(@Param("bUserId") String bUserId,@Param("jobName") String jobName,@Param("status") Integer status);
 
-    int deleteByPrimaryKey(String id);
-
-    int insert(JobInfo record);
-
-    int insertSelective(JobInfo record);
-
     JobInfo selectByPrimaryKey(String id);
 
-    int updateByPrimaryKeySelective(JobInfo record);
-
-    int updateByPrimaryKey(JobInfo record);
 }

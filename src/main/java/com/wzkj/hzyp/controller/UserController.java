@@ -88,13 +88,28 @@ public class UserController extends BaseController {
     @ApiImplicitParams({@ApiImplicitParam(name = "name",value = "姓名",paramType = "query",required = true,dataType = "string"),
             @ApiImplicitParam(name = "age",value = "年龄",paramType = "query",required = true,dataType = "integer")})
     @ApiOperation(value = "更改用户信息",notes = "当用户通过验证码注册时使用，或更改用户信息时")
-    public AjaxResponse updateUser(Integer age,String name){
+    public AjaxResponse updateUser(Integer age,String name,String phone,Integer gender,String avatar){
         AuserInfo aUserInfo = getLoginUser();
         aUserInfo.setAge(age);
         aUserInfo.setName(name);
+        aUserInfo.setEmpowerPhone(phone);
+        aUserInfo.setGender(gender);
+        aUserInfo.setAvatar(avatar);
         aUserInfo.setLastLoginTime(new Date());
         aUserService.updateUserInfo(aUserInfo);
         return new AjaxResponse(ResponseCode.APP_SUCCESS);
+    }
+
+    @RequestMapping(value = "/getUserDetail",method = RequestMethod.POST)
+    @ResponseBody
+    public AjaxResponse getUserDetail(){
+        AuserInfo auserInfo = getLoginUser();
+        if(auserInfo != null){
+            return new AjaxResponse(ResponseCode.APP_SUCCESS,auserInfo);
+        }else {
+            return new AjaxResponse(ResponseCode.APP_FAIL,"未能获取到用户信息！");
+        }
+
     }
 
 

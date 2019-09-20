@@ -82,6 +82,7 @@ public class StoreInfoController extends BaseController {
                 storeInfo.setAvatar(avatar);
             }else {
                 storeInfo.setAvatar(imageConfig.getManAvatarForB());
+                System.out.println(imageConfig.getManAvatarForB());
             }
             storeInfoService.saveStoreInfo(storeInfo);
             Map map = new HashMap();

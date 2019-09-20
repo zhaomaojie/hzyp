@@ -36,7 +36,7 @@
 
   <select id="getResumeList" resultMap="BaseResultMap">
     SELECT *
-    FROM C_RESUME_INFO a
+    FROM c_resume_info a
     WHERE 1 = 1
     <if test="id != null and id !=''">
       AND a.a_user_id = #{id}
@@ -89,7 +89,7 @@
 
   <select id="resumeList" resultMap="BaseResultMap">
     SELECT *
-    FROM C_RESUME_INFO a
+    FROM c_resume_info a
     WHERE 1 = 1
     <if test="aUserId != null and aUserId !=''">
       AND a.a_user_id = #{aUserId}
