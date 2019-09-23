@@ -66,6 +66,8 @@ public class ProcessInfoController extends BaseController {
             List<ProcessInfo> list = processInfoService.getProcessInfoByReceviedId(receviedId);
             PageInfo page = new PageInfo(list);
             Map map = commonService.getMapByList(page,list);
+            //应前端要求 这里总数减一
+            map.put("total",(Integer)map.get("total") - 1);
             return new AjaxResponse(ResponseCode.APP_SUCCESS,map);
         }
     }
@@ -541,6 +543,8 @@ public class ProcessInfoController extends BaseController {
         return new AjaxResponse(ResponseCode.APP_SUCCESS);
     }
 
+
+
     /* *
      * A端 认可
      * @author zhaoMaoJie
@@ -588,7 +592,103 @@ public class ProcessInfoController extends BaseController {
         return new AjaxResponse(ResponseCode.APP_SUCCESS);
     }
 
+    /* *
+     * B端 认可申诉
+     * @author zhaoMaoJie
+     * @date 2019/8/7 0007
+     */
+    @RequestMapping(value = "/approvalAppeal",method = RequestMethod.POST)
+    @ResponseBody
+    public AjaxResponse approvalAppeal(String processInfoId){
+        ProcessInfo processInfo = processInfoService.getProcessInfoById(processInfoId);
+        ProcessInfo newProcessInfo = new ProcessInfo();
+        newProcessInfo.setReceviedId(processInfo.getReceviedId());
+        newProcessInfo.setbUserId(processInfo.getbUserId());
+        newProcessInfo.setaUserId(processInfo.getaUserId());
+        newProcessInfo.setStatus(processInfo.getStatus());
+        newProcessInfo.setDelFlag(0);
+        newProcessInfo.setProcessContent("认可申诉");
+        newProcessInfo.setOwner(1);
+        newProcessInfo.setIsInterview(processInfo.getIsInterview());
+        newProcessInfo.setIsEntry(processInfo.getIsEntry());
+        newProcessInfo.setInterviewTime(processInfo.getInterviewTime());
+        newProcessInfo.setEntryTime(processInfo.getEntryTime());
+        newProcessInfo.setIsQuit(processInfo.getIsQuit());
+        newProcessInfo.setQuitTime(processInfo.getQuitTime());
+        newProcessInfo.setIsEnd(processInfo.getIsEnd());
+        //设置按钮
+        List<JSONObject> jsonB = new ArrayList();
+        Integer status = processInfo.getStatus();
+        if(status != null && status == 1){
+            jsonB = commonService.getJsonList("B","interviewFeedback",false);
+        }else if(status != null && status == 2){
+            jsonB = commonService.getJsonList("B","entryFeedback",false);
+        }else if(status != null && status == 3){
+            jsonB = commonService.getJsonList("B","quitFeedback",false);
+        }
+        String strB = jsonB.toString().replace("\\","");
+        newProcessInfo.setButtonB(strB);
+        newProcessInfo.setCreateTime(new Date());
+        newProcessInfo.setSortNumber(processInfo.getSortNumber() + 1);
+        newProcessInfo.setIsFeedback(0);
+        newProcessInfo.setCreateTime(new Date());
+        processInfoService.saveProcessInfo(newProcessInfo);
+        processInfo.setIsFeedback(1);
+        processInfo.setFeedbackId(newProcessInfo.getId());
+        processInfoService.saveProcessInfo(processInfo);
+        return new AjaxResponse(ResponseCode.APP_SUCCESS);
+    }
+
+    // B 端申诉反馈
+    /* *
+     * B端 认可申诉
+     * @author zhaoMaoJie
+     * @date 2019/8/7 0007
+     */
+    @RequestMapping(value = "/appealFeedback",method = RequestMethod.POST)
+    @ResponseBody
+    public AjaxResponse appealFeedback(String processInfoId,String content){
+        ProcessInfo processInfo = processInfoService.getProcessInfoById(processInfoId);
+        ProcessInfo newProcessInfo = new ProcessInfo();
+        newProcessInfo.setReceviedId(processInfo.getReceviedId());
+        newProcessInfo.setbUserId(processInfo.getbUserId());
+        newProcessInfo.setaUserId(processInfo.getaUserId());
+        newProcessInfo.setStatus(processInfo.getStatus());
+        newProcessInfo.setDelFlag(0);
+        newProcessInfo.setProcessContent(content);
+        newProcessInfo.setOwner(1);
+        newProcessInfo.setIsInterview(processInfo.getIsInterview());
+        newProcessInfo.setIsEntry(processInfo.getIsEntry());
+        newProcessInfo.setInterviewTime(processInfo.getInterviewTime());
+        newProcessInfo.setEntryTime(processInfo.getEntryTime());
+        newProcessInfo.setIsQuit(processInfo.getIsQuit());
+        newProcessInfo.setQuitTime(processInfo.getQuitTime());
+        newProcessInfo.setIsEnd(processInfo.getIsEnd());
+        //设置按钮
+        List<JSONObject> jsonB = new ArrayList();
+        Integer status = processInfo.getStatus();
+        if(status != null && status == 1){
+            jsonB = commonService.getJsonList("B","interviewFeedback",false);
+        }else if(status != null && status == 2){
+            jsonB = commonService.getJsonList("B","entryFeedback",false);
+        }else if(status != null && status == 3){
+            jsonB = commonService.getJsonList("B","quitFeedback",false);
+        }
+        String strB = jsonB.toString().replace("\\","");
+        newProcessInfo.setButtonB(strB);
+        newProcessInfo.setCreateTime(new Date());
+        newProcessInfo.setSortNumber(processInfo.getSortNumber() + 1);
+        newProcessInfo.setIsFeedback(0);
+        newProcessInfo.setCreateTime(new Date());
+        processInfoService.saveProcessInfo(newProcessInfo);
+        processInfo.setIsFeedback(1);
+        processInfo.setFeedbackId(newProcessInfo.getId());
+        processInfoService.saveProcessInfo(processInfo);
+        return new AjaxResponse(ResponseCode.APP_SUCCESS);
+    }
+
     //向平台申诉
+
 
 
 

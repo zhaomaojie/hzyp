@@ -307,8 +307,8 @@ public class LoginController extends BaseController {
                 return new AjaxResponse(ResponseCode.APP_SUCCESS,aUserVO);
             } else {
                 //当用户不存在时 首先执行注册 然后再生成验证码
-//                AuserInfo aUserInfoEntity = getLoginUser();
-                AuserInfo aUserInfoEntity = new AuserInfo();
+                AuserInfo aUserInfoEntity = getLoginUser();
+//                AuserInfo aUserInfoEntity = new AuserInfo();
                 aUserInfoEntity.setEmpowerPhone(phone);
                 Date now = new Date();
                 aUserInfoEntity.setCreateTime(now);
@@ -328,7 +328,7 @@ public class LoginController extends BaseController {
                 }
                 AUserVO aUserVO = new AUserVO();
                 BeanUtils.copyProperties(aUserInfoEntity, aUserVO);
-                aUserVO.setIsLogin(-1);
+                aUserVO.setIsLogin(0);
                 aUserVO.setIsRegister(-1);
                 aUserVO.setVerifyCode("");
                 return new AjaxResponse(ResponseCode.APP_SUCCESS,aUserVO);
@@ -544,6 +544,96 @@ public class LoginController extends BaseController {
         }
     }
 
+    /* *
+     * 切换用户
+     * @author zhaoMaoJie
+     * @date 2019/9/2 0002
+     */
+    @RequestMapping(value = "/switchAccount",method = RequestMethod.POST)
+    @ResponseBody
+    public AjaxResponse switchAccount(String phone,String code){
+        if(StringUtils.isBlank(phone) || StringUtils.isBlank(code)){
+            return new AjaxResponse(ResponseCode.APP_FAIL,"手机号或验证码输入不正确！");
+        }
+        AuserInfo auserInfo = aUserService.getUserInfoByPhone(phone);
+        String name = auserInfo.getName();
+        if(StringUtils.isBlank(name)){
+            return new AjaxResponse(ResponseCode.APP_FAIL,"该手机号未注册！");
+        }else {
+//            AuserInfo auserInfo = aUserService.getUserInfoByPhone(phone);
+            //判断是否当前用户
+            String empowerPhone = auserInfo.getEmpowerPhone();
+            if(phone.equals(empowerPhone)){
+                return new AjaxResponse(ResponseCode.APP_FAIL,"当前账户和手机号重合，无需切换");
+            }
+            //判断验证码
+            String verdifyCode = auserInfo.getVerifyCode();
+            if(!code.equals(verdifyCode)){
+                return new AjaxResponse(ResponseCode.APP_FAIL,"验证码输入错误！");
+            }
+            int difference = DateUtil.getTimeDifferent(auserInfo.getVerdifyCodeTime(), new Date());
+            //判断验证码是否超时
+            if(difference > 5 * 60){
+                return new AjaxResponse(ResponseCode.APP_FAIL,"验证码超时，请重新输入！");
+            }
+            String id = auserInfo.getId();
+            String token = RSAUtil.getToken(id);
+            AUserVO aUserVO = new AUserVO();
+            BeanUtils.copyProperties(auserInfo,aUserVO);
+            aUserVO.setToken(token);
+            Integer age = auserInfo.getAge();
+            Integer gender = auserInfo.getGender();
+            if(StringUtils.isBlank(name) || age == null || gender == null){
+                aUserVO.setIsRegister(-1);
+            }else {
+                aUserVO.setIsRegister(0);
+            }
+            aUserVO.setType(0);
+            aUserVO.setIsLogin(0);
+            return new AjaxResponse(ResponseCode.APP_SUCCESS,aUserVO);
+        }
+    }
+
+    /* *
+     * 切换用户
+     * @author zhaoMaoJie
+     * @date 2019/9/2 0002
+     */
+    @RequestMapping(value = "/switchAccountForB",method = RequestMethod.POST)
+    @ResponseBody
+    public AjaxResponse switchAccountForB(String phone,String code){
+        if(StringUtils.isBlank(phone) || StringUtils.isBlank(code)){
+            return new AjaxResponse(ResponseCode.APP_FAIL,"手机号或验证码输入不正确！");
+        }
+        boolean isExist = buserService.queryUserIsExist(phone);
+        if(!isExist){
+            return new AjaxResponse(ResponseCode.APP_FAIL,"该手机号未注册！");
+        }
+        BuserInfo buserInfo = buserService.getUserInfoByPhone(phone);
+        String empowerPhone = buserInfo.getEmpowerPhone();
+        if(phone.equals(empowerPhone)){
+            return new AjaxResponse(ResponseCode.APP_FAIL,"当前账户和手机号重合，无需切换");
+        }
+        String verdifyCode = buserInfo.getVerifyCode();
+        //验证验证码输入是否正确
+        if(!verdifyCode.equals(code)){
+            return new AjaxResponse(ResponseCode.APP_FAIL,"验证码输入错误！");
+        }
+        //验证超时
+        int difference = DateUtil.getTimeDifferent(buserInfo.getVerdifyCodeTime(), new Date());
+        //判断验证码是否超时
+        if(difference > 5 * 60){
+            return new AjaxResponse(ResponseCode.APP_FAIL,"验证码超时，请重新输入！");
+        }
+        String id = buserInfo.getId();
+        String token = RSAUtil.getToken(id);
+        BuserVO buserVO = new BuserVO();
+        BeanUtils.copyProperties(buserInfo,buserVO);
+        buserVO.setToken(token);
+        buserVO.setIsRegister(0);
+        buserVO.setIsLogin(0);
+        return new AjaxResponse(ResponseCode.APP_SUCCESS,buserVO);
+    }
 
 
 }

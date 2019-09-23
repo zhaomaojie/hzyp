@@ -12,8 +12,8 @@ spring:
     active: local
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/hzyp?serverTimezone=GMT%2b8&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useOldAliasMetadataBehavior=true&useAffectedRows=true
-    username: hzyp
-    password: y7yc7D5fGJf4FtRz
+    username: root
+    password: root
     driver-class-name: com.mysql.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
     # 初始化大小，最小，最大
@@ -180,7 +180,16 @@ project:
           method: approval
         notRecognized:
           text: 向平台申诉
-          method: xx
+          method:
+      terminalB:
+        default:
+          text: 认可申诉
+          method: approvalAppeal
+        feedback:
+          text: 申诉反馈
+          method: appealFeedback
+
+
 
 
 

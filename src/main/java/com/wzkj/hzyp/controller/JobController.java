@@ -58,6 +58,8 @@ public class JobController extends BaseController {
     @ApiOperation(value = "默认页面的岗位列表",notes = "A端获取发布的岗位信息")
     public AjaxResponse getJobList(Integer pageNum,Integer pageSize,String keyWord,Integer label){
         PageHelper.startPage(pageNum,pageSize);
+        //这里laben暂时不放进判断
+        label = null;
         List<JobInfoVO> list = jobInfoService.getJobList(keyWord, label);
         PageInfo page = new PageInfo(list);
         Map map = commonService.getMapByList(page,list);
@@ -210,7 +212,14 @@ public class JobController extends BaseController {
             jobInfo.setOfficialSalary(officialSalary);
             jobInfo.setAvgSalary(avgSalary);
             jobInfo.setReward(reward);
-            jobInfo.setOvertime(overtime);
+            //这里根据前端传过来的数据进行判断过保时间赋值
+            if(overtime != null && overtime == 0){
+                jobInfo.setOvertime(7);
+            }else if(overtime != null && overtime == 1){
+                jobInfo.setOvertime(15);
+            }else if(overtime != null && overtime == 2){
+                jobInfo.setOvertime(30);
+            }
             jobInfo.setTotalAmount(num * reward);
             jobInfo.setStatus(0);
             jobInfo.setDelFlag(0);
@@ -225,10 +234,12 @@ public class JobController extends BaseController {
             return new AjaxResponse(ResponseCode.APP_SUCCESS);
         }else { //修改
             JobInfo jobInfo = jobInfoService.getJobInfoById(id);
+            jobInfo.setbStoreId(storeId);
+            jobInfo.setbUserId(bUserId);
             jobInfo.setIndustryCode(industryCode);
             jobInfo.setJobName(jobName);
             jobInfo.setDescription(description);
-//            jobInfo.setNum(num);
+            jobInfo.setNum(num);
             jobInfo.setEducationDegree(educationDegree);
             jobInfo.setWorkExperience(workExperience);
             jobInfo.setAgeMin(minAge);
@@ -238,9 +249,26 @@ public class JobController extends BaseController {
             jobInfo.setTrialSalary(trialSalary);
             jobInfo.setOfficialSalary(officialSalary);
             jobInfo.setAvgSalary(avgSalary);
-            jobInfo.setInterviewTime(interviewTime);
-            //赏金是否能改动？ 赏金不能改动 因为履约金已经支付过
             jobInfo.setReward(reward);
+            //这里根据前端传过来的数据进行判断过保时间赋值
+            if(overtime != null && overtime == 0){
+                jobInfo.setOvertime(7);
+            }else if(overtime != null && overtime == 1){
+                jobInfo.setOvertime(15);
+            }else if(overtime != null && overtime == 2){
+                jobInfo.setOvertime(30);
+            }
+            jobInfo.setTotalAmount(num * reward);
+            jobInfo.setStatus(0);
+            jobInfo.setDelFlag(0);
+            Integer total = (int)Math.ceil(num * 1.3);
+            jobInfo.setReceviedResumeNumber(0);
+            jobInfo.setTotalResumeNumber(total);
+            jobInfo.setCreateTime(new Date());
+            jobInfo.setUpdateTime(new Date());
+            jobInfo.setIsPay(0);
+            jobInfo.setInterviewTime(interviewTime);
+            jobInfoService.saveJobInfo(jobInfo);
             return new AjaxResponse(ResponseCode.APP_SUCCESS);
         }
     }

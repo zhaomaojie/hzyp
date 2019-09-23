@@ -83,7 +83,7 @@ public class UserController extends BaseController {
         return new AjaxResponse(ResponseCode.APP_SUCCESS,map);
     }
 
-    @RequestMapping(value = "/updateUserInfo",method = RequestMethod.POST)
+    @RequestMapping(value = "/updateUser",method = RequestMethod.POST)
     @ResponseBody
     @ApiImplicitParams({@ApiImplicitParam(name = "name",value = "姓名",paramType = "query",required = true,dataType = "string"),
             @ApiImplicitParam(name = "age",value = "年龄",paramType = "query",required = true,dataType = "integer")})

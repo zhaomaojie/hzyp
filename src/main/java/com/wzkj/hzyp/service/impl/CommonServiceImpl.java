@@ -150,11 +150,11 @@ public class CommonServiceImpl implements CommonService {
                 return list;
             }
         }else if(StringUtils.isNotBlank(processStep) && processStep.equalsIgnoreCase("appeal")){
-            String text = processConfig.getRecognizedText();
-            String method = processConfig.getRecognizedMethod();
+            String text = processConfig.getAppealFeedbackDefaultText();
+            String method = processConfig.getAppealFeedbackDefaultText();
             JSONObject json = getJsonObjectByString(text,method);
-            String notRecognizedText = processConfig.getNotRecognizedText();
-            String notRecognizedMethod = processConfig.getNotRecognizedMethod();
+            String notRecognizedText = processConfig.getAppealFeedbackFeedbackText();
+            String notRecognizedMethod = processConfig.getAppealFeedbackFeedbackMethod();
             JSONObject jsonObject = getJsonObjectByString(notRecognizedText,notRecognizedMethod);
             list.add(json);
             list.add(jsonObject);

@@ -95,6 +95,18 @@ public class ProcessConfig {
     @Value("${project.process.appealfeedback.terminalA.notRecognized.method}")
     private String notRecognizedMethod;
 
+    @Value("${project.process.appealfeedback.terminalB.default.text}")
+    private String appealFeedbackDefaultText;
+
+    @Value("${project.process.appealfeedback.terminalB.default.method}")
+    private String appealFeedbackDefaultMethod;
+
+    @Value("${project.process.appealfeedback.terminalB.feedback.text}")
+    private String appealFeedbackFeedbackText;
+
+    @Value("${project.process.appealfeedback.terminalB.feedback.method}")
+    private String appealFeedbackFeedbackMethod;
+
     public String getCancelResumeText() {
         return cancelResumeText;
     }
@@ -317,5 +329,37 @@ public class ProcessConfig {
 
     public void setSmsTemplateMethod(String smsTemplateMethod) {
         this.smsTemplateMethod = smsTemplateMethod;
+    }
+
+    public String getAppealFeedbackDefaultText() {
+        return appealFeedbackDefaultText;
+    }
+
+    public void setAppealFeedbackDefaultText(String appealFeedbackDefaultText) {
+        this.appealFeedbackDefaultText = appealFeedbackDefaultText;
+    }
+
+    public String getAppealFeedbackDefaultMethod() {
+        return appealFeedbackDefaultMethod;
+    }
+
+    public void setAppealFeedbackDefaultMethod(String appealFeedbackDefaultMethod) {
+        this.appealFeedbackDefaultMethod = appealFeedbackDefaultMethod;
+    }
+
+    public String getAppealFeedbackFeedbackText() {
+        return appealFeedbackFeedbackText;
+    }
+
+    public void setAppealFeedbackFeedbackText(String appealFeedbackFeedbackText) {
+        this.appealFeedbackFeedbackText = appealFeedbackFeedbackText;
+    }
+
+    public String getAppealFeedbackFeedbackMethod() {
+        return appealFeedbackFeedbackMethod;
+    }
+
+    public void setAppealFeedbackFeedbackMethod(String appealFeedbackFeedbackMethod) {
+        this.appealFeedbackFeedbackMethod = appealFeedbackFeedbackMethod;
     }
 }
