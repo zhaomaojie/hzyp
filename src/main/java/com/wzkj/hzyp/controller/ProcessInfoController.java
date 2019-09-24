@@ -235,7 +235,9 @@ public class ProcessInfoController extends BaseController {
             newProcessInfo.setIsEnd(0);
             newProcessInfo.setIsInterview(0);
             newProcessInfo.setInterviewTime(timeFormat);
-            newProcessInfo.setProcessContent("修改面试时间为" + DateUtil.dateToString(timeFormat,DateUtil.ymdFormat));
+            String dateStr = "修改面试时间为" + DateUtil.dateToString(timeFormat,DateUtil.simpleFormat);
+            String dateFormat = dateStr.substring(0,dateStr.lastIndexOf(":"));
+            newProcessInfo.setProcessContent(dateFormat);
             newProcessInfo.setSortNumber(processInfo.getSortNumber() + 1);
             newProcessInfo.setIsFeedback(0);
             //设置按钮
@@ -390,7 +392,7 @@ public class ProcessInfoController extends BaseController {
             newProcessInfo.setStatus(processInfo.getStatus());
             newProcessInfo.setIsFeedback(0);
             newProcessInfo.setDelFlag(0);
-            newProcessInfo.setProcessContent("修改入职时间为：" + DateUtil.dateToString(timeFormat,DateUtil.ymdFormat) + "日");
+            newProcessInfo.setProcessContent("修改入职时间为：" + DateUtil.dateToString(timeFormat,DateUtil.simpleFormat) + "日");
             newProcessInfo.setOwner(1);
             newProcessInfo.setIsInterview(processInfo.getIsInterview());
             newProcessInfo.setIsEntry(0);
@@ -514,7 +516,6 @@ public class ProcessInfoController extends BaseController {
     public AjaxResponse appeal(String processInfoId,String content){
         ProcessInfo processInfo = processInfoService.getProcessInfoById(processInfoId);
         ProcessInfo newProcessInfo = new ProcessInfo();
-        processInfo.setIsFeedback(1);
         newProcessInfo.setReceviedId(processInfo.getReceviedId());
         newProcessInfo.setbUserId(processInfo.getbUserId());
         newProcessInfo.setaUserId(processInfo.getaUserId());
@@ -538,6 +539,7 @@ public class ProcessInfoController extends BaseController {
         newProcessInfo.setSortNumber(processInfo.getSortNumber() + 1);
         newProcessInfo.setCreateTime(new Date());
         processInfoService.saveProcessInfo(newProcessInfo);
+        processInfo.setIsFeedback(1);
         processInfo.setFeedbackId(newProcessInfo.getId());
         processInfoService.saveProcessInfo(processInfo);
         return new AjaxResponse(ResponseCode.APP_SUCCESS);

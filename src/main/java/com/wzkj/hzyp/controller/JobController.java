@@ -264,7 +264,6 @@ public class JobController extends BaseController {
             Integer total = (int)Math.ceil(num * 1.3);
             jobInfo.setReceviedResumeNumber(0);
             jobInfo.setTotalResumeNumber(total);
-            jobInfo.setCreateTime(new Date());
             jobInfo.setUpdateTime(new Date());
             jobInfo.setIsPay(0);
             jobInfo.setInterviewTime(interviewTime);

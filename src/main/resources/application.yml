@@ -159,7 +159,7 @@ project:
           text: 未入职
           method: entryFeedback
         updateTime:
-          text: 修改入职时间
+          text: 修改时间
           method: entryFeedback
     quitFeedback:
       terminalA:
